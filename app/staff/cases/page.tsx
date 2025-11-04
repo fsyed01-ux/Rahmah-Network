@@ -1,44 +1,46 @@
 "use client"
 
+import { useEffect, useState } from "react"
 import Link from "next/link"
 import { Heart, AlertCircle } from "lucide-react"
 
 interface Case {
-  id: string
-  applicantName: string
-  caseId: string
-  status: string
-  statusColor: string
-  priority: string
+  _id: string
+  firstName: string
+  lastName: string
   requestType: string
-  amount: string
-  submittedDate?: string
+  amountRequested: number | null
+  status: string
+  createdAt: string
 }
 
 export default function CasesPage() {
-  const cases: Case[] = [
-    {
-      id: "1",
-      applicantName: "Ahmed Khan",
-      caseId: "6f806763",
-      status: "Need Info",
-      statusColor: "bg-yellow-100 text-yellow-800",
-      priority: "high",
-      requestType: "Zakat",
-      amount: "$3000",
-    },
-    {
-      id: "2",
-      applicantName: "Faizan Syed",
-      caseId: "1cc2b300",
-      status: "Ready for Approval",
-      statusColor: "bg-purple-100 text-purple-800",
-      priority: "high",
-      requestType: "N/A",
-      amount: "$2500",
-      submittedDate: "10/10/2025",
-    },
-  ]
+  const [cases, setCases] = useState<Case[]>([])
+  const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    const fetchCases = async () => {
+      try {
+        const res = await fetch("https://rahmah-exchange-backend-production.up.railway.app/api/zakatApplicants", {
+          cache: "no-store",
+        })
+
+        const result = await res.json()
+        console.log("Fetched data:", result) // 
+
+        // Handle both formats: array or object with 'data'
+        const caseData = Array.isArray(result) ? result : result.data || []
+
+        setCases(caseData)
+      } catch (error) {
+        console.error("Error fetching cases:", error)
+      } finally {
+        setLoading(false)
+      }
+    }
+
+    fetchCases()
+  }, [])
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-teal-50 to-blue-50">
@@ -64,26 +66,47 @@ export default function CasesPage() {
           <p className="text-gray-600">Welcome, System</p>
         </div>
 
+        {/* Loading */}
+        {loading && <p className="text-gray-600">Loading cases...</p>}
+
+        {/* No Cases */}
+        {!loading && cases.length === 0 && (
+          <p className="text-gray-600">No cases found.</p>
+        )}
+
         {/* Cases List */}
         <div className="space-y-6">
           {cases.map((caseItem) => (
-            <div key={caseItem.id} className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition">
+            <div
+              key={caseItem._id}
+              className="bg-white rounded-lg p-6 shadow-sm hover:shadow-md transition"
+            >
               <div className="flex items-start justify-between mb-4">
                 <div>
-                  <h3 className="text-lg font-bold text-gray-900">{caseItem.applicantName}</h3>
+                  <h3 className="text-lg font-bold text-gray-900">
+                    {caseItem.firstName} {caseItem.lastName}
+                  </h3>
                   <div className="flex items-center gap-4 mt-2">
-                    <span className={`px-3 py-1 rounded-full text-sm font-medium ${caseItem.statusColor}`}>
+                    <span
+                      className={`px-3 py-1 rounded-full text-sm font-medium ${
+                        caseItem.status === "Pending"
+                          ? "bg-yellow-100 text-yellow-800"
+                          : caseItem.status === "Approved"
+                          ? "bg-green-100 text-green-800"
+                          : "bg-gray-100 text-gray-800"
+                      }`}
+                    >
                       {caseItem.status}
                     </span>
-                    {caseItem.priority === "high" && (
-                      <div className="flex items-center gap-2 text-red-600">
-                        <AlertCircle className="w-4 h-4" />
-                        <span className="text-sm font-medium">High Priority</span>
-                      </div>
-                    )}
+
+                    <div className="flex items-center gap-2 text-red-600">
+                      <AlertCircle className="w-4 h-4" />
+                      <span className="text-sm font-medium">High Priority</span>
+                    </div>
                   </div>
                 </div>
-                <Link href={`/staff/cases/${caseItem.id}`}>
+
+                <Link href={`/staff/cases/${caseItem._id}`}>
                   <button className="px-4 py-2 text-teal-600 font-medium hover:text-teal-700 transition">
                     View Case
                   </button>
@@ -94,22 +117,30 @@ export default function CasesPage() {
               <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-6 pt-6 border-t border-gray-200">
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Case ID</p>
-                  <p className="font-semibold text-gray-900">{caseItem.caseId}</p>
+                  <p className="font-semibold text-gray-900">
+                    {caseItem._id.slice(-8)}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Request Type</p>
-                  <p className="font-semibold text-gray-900">{caseItem.requestType}</p>
+                  <p className="font-semibold text-gray-900">
+                    {caseItem.requestType || "N/A"}
+                  </p>
                 </div>
                 <div>
                   <p className="text-sm text-gray-600 mb-1">Amount Requested</p>
-                  <p className="font-semibold text-gray-900">{caseItem.amount}</p>
+                  <p className="font-semibold text-gray-900">
+                    {caseItem.amountRequested
+                      ? `$${caseItem.amountRequested}`
+                      : "Not specified"}
+                  </p>
                 </div>
-                {caseItem.submittedDate && (
-                  <div>
-                    <p className="text-sm text-gray-600 mb-1">Submitted</p>
-                    <p className="font-semibold text-gray-900">{caseItem.submittedDate}</p>
-                  </div>
-                )}
+                <div>
+                  <p className="text-sm text-gray-600 mb-1">Submitted</p>
+                  <p className="font-semibold text-gray-900">
+                    {new Date(caseItem.createdAt).toLocaleDateString()}
+                  </p>
+                </div>
               </div>
             </div>
           ))}

@@ -1,3 +1,4 @@
+
 // "use client"
 // import axios from "axios"
 // import type React from "react"
@@ -143,12 +144,12 @@
 //   const handleSubmit = async () => {
 //     setIsSubmitting(true)
 //     try {
-//       const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000"
+//       const API_BASE_URL =
+//         process.env.NEXT_PUBLIC_API_URL || "https://rahmah-exchange-backend-production.up.railway.app"
 
 //       // Create FormData to handle file uploads
 //       const submitData = new FormData()
 
-      
 //       // Add all form data
 //       submitData.append("firstName", formData.firstName)
 //       submitData.append("lastName", formData.lastName)
@@ -186,9 +187,13 @@
 //         submitData.append(`documents`, file)
 //       })
 
-//      const response = await axios.post("http://localhost:5000/api/zakatApplicants", formData, {
-//   headers: { "Content-Type": "multipart/form-data" },
-// });
+//       const response = await axios.post(
+//         "https://rahmah-exchange-backend-production.up.railway.app/api/zakatApplicants",
+//         submitData,
+//         {
+//           headers: { "Content-Type": "multipart/form-data" },
+//         },
+//       )
 
 //       console.log("✅ Application submitted:", response.data)
 //       showToast("Application submitted successfully!", "success")
@@ -1034,7 +1039,7 @@ import axios from "axios"
 import type React from "react"
 
 import { useState } from "react"
-import { ChevronLeft, Upload, CheckCircle2, AlertCircle, CheckCircle } from 'lucide-react'
+import { ChevronLeft, Upload, CheckCircle2, AlertCircle, CheckCircle } from "lucide-react"
 import Link from "next/link"
 
 function Toast({ message, type, isVisible }: { message: string; type: "success" | "error"; isVisible: boolean }) {
@@ -1174,7 +1179,8 @@ export default function ApplyPage() {
   const handleSubmit = async () => {
     setIsSubmitting(true)
     try {
-      const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "https://rahmah-exchange-backend-production.up.railway.app"
+      const API_BASE_URL =
+        process.env.NEXT_PUBLIC_API_URL || "https://rahmah-exchange-backend-production.up.railway.app"
 
       // Create FormData to handle file uploads
       const submitData = new FormData()
@@ -1216,19 +1222,26 @@ export default function ApplyPage() {
         submitData.append(`documents`, file)
       })
 
-      const response = await axios.post("http://localhost:5000/api/zakatApplicants", submitData, {
-        headers: { "Content-Type": "multipart/form-data" },
-      })
+      const response = await axios.post(
+        "https://rahmah-exchange-backend-production.up.railway.app/api/zakatApplicants",
+        submitData,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        },
+      )
 
-      console.log("✅ Application submitted:", response.data)
-      showToast("Application submitted successfully!", "success")
-      setIsSubmitted(true)
+      if (response) {
+        console.log("[v0] Application submitted successfully:", response.data)
+        showToast("Application submitted successfully!", "success")
+        setIsSubmitted(true)
+        setIsSubmitting(false)
+        return // Exit function early on success
+      }
     } catch (error: any) {
       const errorMessage =
         error.response?.data?.message || "Something went wrong submitting your application. Please try again."
-      console.error("❌ Error submitting application:", error)
+      console.error("[v0] Error submitting application:", error)
       showToast(errorMessage, "error")
-    } finally {
       setIsSubmitting(false)
     }
   }

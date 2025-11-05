@@ -26,12 +26,12 @@ type StatusRowProps = {
 }
 
 export default function DashboardPage() {
-  const [activeTab, setActiveTab] = useState("overview")
-  const [showSuccess, setShowSuccess] = useState(true)
+  const [activeTab, ] = useState("overview")
+  // const [showSuccess, ] = useState(true)
   const [applicants, setApplicants] = useState<ZakatApplicant[]>([])
   const [totalFromAPI, setTotalFromAPI] = useState<number | null>(null)
   const [loading, setLoading] = useState(true)
-  const [showDebug, setShowDebug] = useState(false)
+  const [showDebug,] = useState(false)
 
   const normalizeStatus = (status?: string) => {
     return (status || "")
@@ -151,7 +151,7 @@ export default function DashboardPage() {
 
                   <StatCard
                     title="Total Disbursed"
-                    value={"$6000.00"}
+                    value={"$0.00"}
                     color="text-teal-600"
                     icon={<DollarSign className="w-5 h-5 text-teal-600" />}
                   />

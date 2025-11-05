@@ -69,7 +69,7 @@ export default function StaffLoginPage() {
 
           <div className="bg-white rounded-2xl p-8 shadow-sm">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">Login</h2>
-            <p className="text-gray-600 mb-8">Please enter details</p>
+            <p className="text-gray-600 mb-8">Please enter your credentials</p>
 
             <form onSubmit={handleLogin} className="space-y-6">
               <div>
@@ -104,13 +104,6 @@ export default function StaffLoginPage() {
                 {loading ? "Wait.." : "Log In"}
               </button>
             </form>
-
-            <p className="text-center text-gray-600 text-sm mt-8">
-              Not have account?{" "}
-              <Link href="/staff/signup" className="text-teal-600 font-medium hover:underline">
-                Sign up
-              </Link>
-            </p>
           </div>
         </div>
       </div>

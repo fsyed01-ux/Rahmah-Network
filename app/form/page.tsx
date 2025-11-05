@@ -120,10 +120,10 @@ export default function ApplyPage() {
     return emailRegex.test(email)
   }
 
-  const validatePhoneNumber = (phone: string): boolean => {
-    const digitsOnly = phone.replace(/\D/g, "")
-    return digitsOnly.length === 12
-  }
+  // const = (phone: string): boolean => {
+  //   const digitsOnly = phone.replace(/\D/g, "")
+  //   return digitsOnly.length === 12
+  // }
 
   const validateDateOfBirth = (date: string): boolean => {
     if (!date) return false
@@ -171,7 +171,7 @@ export default function ApplyPage() {
     if (!formData.legalStatus) newErrors.legalStatus = "Please fill this field"
     if (!formData.referredBy.trim()) newErrors.referredBy = "Please fill this field"
 
-    if (formData.mobilePhone.trim() && !validatePhoneNumber(formData.mobilePhone)) {
+    if (formData.mobilePhone.trim() && (formData.mobilePhone)) {
       newErrors.mobilePhone = "Check your number (must be 12 digits)"
     }
     if (formData.dateOfBirth && !validateDateOfBirth(formData.dateOfBirth)) {
@@ -272,8 +272,8 @@ export default function ApplyPage() {
     if (!formData.reference1.phoneNumber.trim()) {
       newErrors["reference1.phoneNumber"] = "Please enter phone number"
     }
-    if (formData.reference1.phoneNumber.trim() && !validatePhoneNumber(formData.reference1.phoneNumber)) {
-      newErrors["reference1.phoneNumber"] = "Phone must be 12 digits"
+    if (formData.reference1.phoneNumber.trim() && (formData.reference1.phoneNumber)) {
+      newErrors["reference1.phoneNumber"] = "+92 300 0000000"
     }
     if (!formData.reference1.relationship.trim()) {
       newErrors["reference1.relationship"] = "Please explain relationship"
@@ -285,7 +285,7 @@ export default function ApplyPage() {
     if (!formData.reference2.phoneNumber.trim()) {
       newErrors["reference2.phoneNumber"] = "Please enter phone number"
     }
-    if (formData.reference2.phoneNumber.trim() && !validatePhoneNumber(formData.reference2.phoneNumber)) {
+    if (formData.reference2.phoneNumber.trim() && (formData.reference2.phoneNumber)) {
       newErrors["reference2.phoneNumber"] = "Phone must be 12 digits"
     }
     if (!formData.reference2.relationship.trim()) {

@@ -6,6 +6,7 @@ import { useState } from "react"
 import { ChevronLeft, Upload, CheckCircle2, AlertCircle, CheckCircle } from "lucide-react"
 import Link from "next/link"
 import { Alert, AlertDescription } from "@/components/ui/alert"
+import ApplicationStatus from "@/components/application-status"
 
 function Toast({ message, type, isVisible }: { message: string; type: "success" | "error"; isVisible: boolean }) {
   if (!isVisible) return null
@@ -455,8 +456,8 @@ export default function ApplyPage() {
 
   if (isSubmitted) {
     return (
-    <div className="min-h-screen bg-linear-to-b from-teal-50 to-blue-50">
-      <header className="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-white">
+      <div className="min-h-screen bg-linear-to-b from-teal-50 to-blue-50">
+        <header className="flex items-center justify-between px-8 py-6 border-b border-gray-200 bg-white">
           <Link href="/" className="flex items-center gap-2 text-gray-900 hover:text-teal-600 transition font-medium">
             <ChevronLeft className="w-5 h-5" />
             Back to Home
@@ -469,45 +470,7 @@ export default function ApplyPage() {
             <p className="text-green-800 font-semibold">Application submitted successfully!</p>
           </div>
 
-          <div className="bg-white rounded-2xl p-8 shadow-sm">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">Application Status</h1>
-
-            <div className="mb-8 pb-8 border-b border-gray-200">
-              <p className="text-gray-600 text-sm font-medium mb-2">Current Status</p>
-              <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-50 border border-blue-200 rounded-lg">
-                <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                <span className="text-blue-700 font-semibold text-sm">Submitted</span>
-              </div>
-            </div>
-
-            <div className="mb-8">
-              <h2 className="text-xl font-semibold text-gray-900 mb-6">Application Details</h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div>
-                  <p className="text-gray-600 text-sm mb-1">Case ID</p>
-                  <p className="text-gray-900 font-semibold">b6b368b5</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm mb-1">Submitted Date</p>
-                  <p className="text-gray-900 font-semibold">{new Date().toLocaleDateString("en-GB")}</p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm mb-1">Applicant Name</p>
-                  <p className="text-gray-900 font-semibold">
-                    {formData.firstName} {formData.lastName}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-600 text-sm mb-1">Request Type</p>
-                  <p className="text-gray-900 font-semibold">{formData.requestType}</p>
-                </div>
-              </div>
-            </div>
-
-            <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
-              <p className="text-blue-900 text-sm">Your application has been received and is pending review.</p>
-            </div>
-          </div>
+          <ApplicationStatus email={formData.email} />
         </div>
       </div>
     )
@@ -561,7 +524,6 @@ export default function ApplyPage() {
           </div>
         </div>
 
-        {/* Form Card */}
         <div className="bg-white rounded-2xl p-8 shadow-sm">
           {currentStep === 1 && (
             <div>

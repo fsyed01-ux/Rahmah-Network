@@ -6,7 +6,18 @@ export async function GET(request: NextRequest, { params }: { params: { filename
   try {
     const { filename } = await params
     const uploadsDir = path.join(process.cwd(), "public", "uploads")
-    const filePath = path.join(uploadsDir, filename)
+    let filePath = path.join(uploadsDir, filename)
+
+    // If not found in public/uploads, check ephemeral /tmp/uploads (serverless)
+    try {
+      const tmpPath = path.join("/tmp/uploads", filename)
+      // prefer tmp if exists
+      const { existsSync } = require("fs")
+      if (existsSync(tmpPath)) {
+        filePath = tmpPath
+      }
+    } catch (e) {}
+    
 
     // Security: Ensure file is within uploads directory
     if (!filePath.startsWith(uploadsDir)) {

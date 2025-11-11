@@ -882,9 +882,9 @@ function ApplyPage() {
         }
     };
     const handleSubmit = async ()=>{
-        console.log("[v0] handleSubmit called. Documents count:", formData.documents.length);
+        console.log("handleSubmit called. Documents count:", formData.documents.length);
         if (!formData.documents || formData.documents.length === 0) {
-            console.log("[v0] No documents found. Form data documents:", formData.documents);
+            console.log("No documents found. Form data documents:", formData.documents);
             showToast("Please upload at least one document", "error");
             setIsSubmitting(false);
             return;
@@ -922,14 +922,14 @@ function ApplyPage() {
             submitData.append("previousZakat", formData.previousZakat);
             submitData.append("reference1", JSON.stringify(formData.reference1));
             submitData.append("reference2", JSON.stringify(formData.reference2));
-            console.log("[v0] Documents being submitted:", formData.documents.length);
+            console.log("Documents being submitted:", formData.documents.length);
             for(let i = 0; i < formData.documents.length; i++){
                 const file = formData.documents[i];
                 if (file && file instanceof File) {
-                    console.log(`[v0] Appending document ${i + 1}:`, file.name, file.size, file.type);
+                    console.log(`Appending document ${i + 1}:`, file.name, file.size, file.type);
                     submitData.append("documents", file);
                 } else {
-                    console.warn(`[v0] Skipping invalid document at index ${i}:`, file);
+                    console.warn(`Skipping invalid document at index ${i}:`, file);
                 }
             }
             const response = await __TURBOPACK__imported__module__$5b$project$5d2f$node_modules$2f2e$pnpm$2f$axios$40$1$2e$13$2e$2$2f$node_modules$2f$axios$2f$lib$2f$axios$2e$js__$5b$app$2d$client$5d$__$28$ecmascript$29$__["default"].post(API_URL, submitData, {
@@ -938,14 +938,14 @@ function ApplyPage() {
                 }
             });
             if (response.status === 201 || response.data.applicant) {
-                console.log("[v0] Application submitted successfully:", response.data);
+                console.log("Application submitted successfully:", response.data);
                 showToast("Application submitted successfully!", "success");
                 setIsSubmitted(true);
                 return;
             }
         } catch (error) {
             const errorMessage = error.response?.data?.error || error.response?.data?.message || "Something went wrong submitting your application. Please try again.";
-            console.error("[v0] Error submitting application:", error, errorMessage);
+            console.error("Error submitting application:", error, errorMessage);
             showToast(errorMessage, "error");
         } finally{
             setIsSubmitting(false);

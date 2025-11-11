@@ -1,22 +1,28 @@
 "use client"
 
-import type React from "react"
-
 import { useEffect, useState } from "react"
 import { useSearchParams } from "next/navigation"
+import { CheckCircle, XCircle, Clock, Mail, ArrowRight, Heart } from "lucide-react"
 
 const API_URL = "/api/zakat-applicants"
+
+interface ApplicationData {
+  status: string
+  email: string
+  caseId: string
+  requestedAmount?: number
+  applicationDate?: string
+}
 
 export default function ApplicationStatusPage() {
   const searchParams = useSearchParams()
   const emailFromQuery = searchParams.get("email") || ""
 
   const [email, setEmail] = useState(emailFromQuery)
-  const [status, setStatus] = useState<string | null>(null)
+  const [applicationData, setApplicationData] = useState<ApplicationData | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  // ✅ Automatically call API if email is passed via URL
   useEffect(() => {
     if (emailFromQuery) {
       handleCheckStatus()
@@ -28,69 +34,141 @@ export default function ApplicationStatusPage() {
     if (e) e.preventDefault()
     setLoading(true)
     setError(null)
-    setStatus(null)
+    setApplicationData(null)
 
     try {
       const res = await fetch(`${API_URL}?email=${encodeURIComponent(email)}`)
-      if (res.status === 404) {
-        setError("You're not registered. Please apply first.")
-        return
-      }
-      if (!res.ok) throw new Error("Failed to check status")
       const data = await res.json()
-      if (data.items && data.items.length > 0) {
-        setStatus(data.items[0].status)
-      } else {
-        setError("You're not registered. Please apply first.")
+
+      if (!res.ok || !data.items || !Array.isArray(data.items)) {
+        throw new Error(data.error || "Invalid data from server")
       }
+
+      const applicant = data.items.find((item: any) => item.email === email)
+      if (!applicant) throw new Error("Application not found")
+
+      setApplicationData({
+        status: applicant.status,
+        email: applicant.email,
+        caseId: applicant.caseId || applicant._id,
+        requestedAmount: applicant.amountRequested,
+        applicationDate: applicant.createdAt
+          ? new Date(applicant.createdAt).toLocaleDateString()
+          : "",
+      })
     } catch (err: unknown) {
-      if (err instanceof Error) {
-        setError(err.message)
-      } else {
-        setError("An unexpected error occurred")
-      }
+      console.error(err)
+      setError(err instanceof Error ? err.message : "An unexpected error occurred")
     } finally {
       setLoading(false)
     }
   }
 
+  const getStatusDisplay = (status: string) => {
+    const statusLower = status?.toLowerCase() || ""
+
+    if (statusLower === "approved") {
+      return {
+        icon: CheckCircle,
+        color: "text-green-600",
+        title: "Approved",
+        message: "Your application has been approved. You will receive an email shortly.",
+      }
+    } else if (statusLower === "rejected") {
+      return {
+        icon: XCircle,
+        color: "text-red-600",
+        title: "Rejected",
+        message: "Unfortunately, your application was declined. Contact support for help.",
+      }
+    } else {
+      return {
+        icon: Clock,
+        color: "text-amber-600",
+        title: "Under Review",
+        message: "Your application is being reviewed. You will be notified via email.",
+      }
+    }
+  }
+
+  const statusInfo = applicationData ? getStatusDisplay(applicationData.status) : null
+  const StatusIcon = statusInfo ? statusInfo.icon : Clock
+
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gradient-to-b from-white to-gray-50 px-4">
-      <div className="bg-white shadow-lg rounded-2xl p-8 max-w-md w-full text-center border border-gray-200">
-        <h1 className="text-3xl font-bold text-gray-900 mb-4">Check Your Application Status</h1>
+    <div className="min-h-screen flex flex-col">
+      {/* Header */}
+     <header className="flex items-center justify-between px-8 py-6 max-w-7xl mx-auto w-full border-b border-gray-200">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 bg-gradient-to-br from-teal-600 to-cyan-600 rounded-full flex items-center justify-center shadow-lg">
+            <Heart className="w-6 h-6 text-white fill-white" />
+          </div>
+          <h1 className="text-2xl font-bold text-gray-900">Rahmah Exchange</h1>
+        </div>
+      </header>
 
-        {!emailFromQuery && <p className="text-gray-600 mb-6">Enter your email to see your current status.</p>}
+      {/* Main Content */}
+      <main className="flex-1 flex flex-col items-center justify-center px-6 py-12">
+        {!applicationData && !loading && (
+          <div className="w-full max-w-md">
+            <h2 className="text-xl font-semibold mb-4 text-center">Check Your Application Status</h2>
+            <form onSubmit={handleCheckStatus} className="space-y-4">
+              <input
+                type="email"
+                placeholder="Enter your email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-gray-300 rounded-lg px-4 py-2 focus:outline-none focus:ring-2 focus:ring-teal-500"
+              />
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full bg-teal-600 text-white py-2 rounded-lg flex items-center justify-center gap-2 hover:bg-teal-700 disabled:opacity-50"
+              >
+                {loading ? "Checking..." : "Check Status"} <ArrowRight size={16} />
+              </button>
+            </form>
+            {error && (
+              <p className="mt-4 text-red-600 text-sm text-center">{error}</p>
+            )}
+          </div>
+        )}
 
-        {/* Show form only if email was not passed in URL */}
-        {!emailFromQuery && (
-          <form onSubmit={handleCheckStatus} className="space-y-4">
-            <input
-              type="email"
-              required
-              placeholder="Enter your email"
-              className="w-full border border-gray-300 rounded-lg px-4 py-3 focus:ring-2 focus:ring-teal-500 outline-none"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-            />
+        {loading && (
+          <div className="text-center">
+            <div className="w-10 h-10 border-4 border-gray-300 border-t-teal-600 rounded-full animate-spin mx-auto mb-4"></div>
+            <p className="text-gray-700">Checking your application...</p>
+          </div>
+        )}
+
+        {applicationData && statusInfo && (
+          <div className="w-full max-w-md text-center space-y-4">
+            <StatusIcon size={48} className={`mx-auto ${statusInfo.color}`} />
+            <h2 className="text-2xl font-bold">{statusInfo.title}</h2>
+            <p className="text-gray-700">{statusInfo.message}</p>
+            <div className="text-gray-600 text-sm">
+              <p>Case ID: {applicationData.caseId}</p>
+              {applicationData.requestedAmount && <p>Amount: PKR {applicationData.requestedAmount.toLocaleString()}</p>}
+              {applicationData.applicationDate && <p>Date: {applicationData.applicationDate}</p>}
+              <p>Email: {applicationData.email}</p>
+            </div>
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-teal-600 to-cyan-600 text-white py-3 rounded-lg font-semibold hover:shadow-lg transition"
+              onClick={() => {
+                setApplicationData(null)
+                setEmail("")
+              }}
+              className="mt-4 w-full py-2 border border-teal-600 text-teal-600 rounded-lg hover:bg-teal-50"
             >
-              {loading ? "Checking..." : "Check Status"}
+              Check Another Application
             </button>
-          </form>
+          </div>
         )}
+      </main>
 
-        {/* Status messages */}
-        {loading && <p className="mt-4 text-gray-500">Loading...</p>}
-        {error && <p className="mt-4 text-red-500 font-medium">{error}</p>}
-        {status && (
-          <p className="mt-6 text-lg font-semibold text-teal-600">
-            You're Application is <span className="text-gray-900">{status}</span>
-          </p>
-        )}
-      </div>
+      {/* Footer */}
+      <footer className="px-8 py-6 bg-gray-900 text-white text-center text-sm">
+        2025 Rahmah Exchange. All rights reserved.
+      </footer>
     </div>
   )
 }

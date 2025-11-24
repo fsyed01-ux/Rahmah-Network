@@ -109,7 +109,9 @@ messageSchema.index({ caseId: 1, createdAt: -1 })
 messageSchema.index({ conversationId: 1, createdAt: -1 })
 messageSchema.index({ senderId: 1, createdAt: -1 })
 messageSchema.index({ applicantId: 1, createdAt: -1 })
-messageSchema.index({ recipientIds: 1, readBy: 1 })
+// Separate indexes for arrays - MongoDB doesn't support compound indexes on parallel arrays
+messageSchema.index({ recipientIds: 1 })
+messageSchema.index({ "readBy.userId": 1 })
 messageSchema.index({ isDeleted: 1 })
 
 export default mongoose.models.Message || mongoose.model("Message", messageSchema)

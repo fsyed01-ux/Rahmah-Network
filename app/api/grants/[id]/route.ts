@@ -97,11 +97,15 @@ export async function PUT(request: NextRequest, { params }: { params: Promise<{ 
     delete grantObj.amountGranted
     delete grantObj.notes
 
-    // Send email to applicant when grant is updated (fire-and-forget)
-    ;(async () => {
-      try {
-        const applicant = grantObj.applicantId as any
-        if (applicant && applicant.email) {
+    // Check if this is an old case - skip emails for old cases
+    const applicant = grantObj.applicantId as any
+    const isOldCase = applicant && (applicant as any).isOldCase === true
+
+    // Send email to applicant when grant is updated (fire-and-forget) - skip if old case
+    if (!isOldCase) {
+      ;(async () => {
+        try {
+          if (applicant && applicant.email) {
           const baseUrl = new URL(request.url).origin
           const statusPageUrl = `${baseUrl}/`
 
@@ -161,11 +165,14 @@ JazakAllahu Khairan.
 — Rahmah Foundation Team`,
           })
         }
-      } catch (emailError) {
-        console.error("[grant] Failed to send email:", emailError)
-        // Don't throw - email failure shouldn't block the grant update
-      }
-    })()
+        } catch (emailError) {
+          console.error("[grant] Failed to send email:", emailError)
+          // Don't throw - email failure shouldn't block the grant update
+        }
+      })()
+    } else {
+      console.log("[grant] Skipping email notification (old case)")
+    }
 
     return NextResponse.json(grantObj)
   } catch (error: any) {

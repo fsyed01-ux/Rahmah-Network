@@ -44,7 +44,8 @@ const STEPS = [
   { number: 5, label: "Request" },
   { number: 6, label: "References" },
   { number: 7, label: "Documents" },
-  { number: 8, label: "Review" },
+  { number: 8, label: "Grant Details" },
+  { number: 9, label: "Review" },
 ]
 
 export default function AddOldCasePage() {
@@ -61,6 +62,7 @@ export default function AddOldCasePage() {
   const [errors, setErrors] = useState<ValidationErrors>({})
   const [emailExists, setEmailExists] = useState(false)
   const [checkingEmail, setCheckingEmail] = useState(false)
+  const [savedApplicantId, setSavedApplicantId] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
     // Step 1: Personal
@@ -102,6 +104,11 @@ export default function AddOldCasePage() {
     reference2: { fullName: "", phoneNumber: "", email: "", relationship: "" },
     // Step 7: Documents
     documents: [] as File[],
+    // Step 9: Grant Details
+    approvedAmount: "",
+    numberOfMonths: "",
+    grantStatus: "Approved",
+    paymentProof: [] as File[],
   })
 
   // Check authentication on mount - no API calls for data
@@ -117,11 +124,47 @@ export default function AddOldCasePage() {
     setTimeout(() => setToast((prev) => ({ ...prev, isVisible: false })), 4000)
   }
 
+  const validateEmail = (email: string): boolean => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    return emailRegex.test(email)
+  }
+
+  const checkEmailExists = async (email: string): Promise<boolean> => {
+    if (!email || !validateEmail(email)) return false
+
+    setCheckingEmail(true)
+    try {
+      const token = getAuthToken()
+      if (!token) return false
+
+      const response = await authenticatedFetch(API_URL)
+      const data = await response.json()
+
+      if (data.items && Array.isArray(data.items)) {
+        const exists = data.items.some((item: any) => item.email?.toLowerCase() === email.toLowerCase())
+        setEmailExists(exists)
+        return exists
+      } else if (Array.isArray(data)) {
+        const exists = data.some((item: any) => item.email?.toLowerCase() === email.toLowerCase())
+        setEmailExists(exists)
+        return exists
+      }
+    } catch (error) {
+      console.error("Error checking email:", error)
+    } finally {
+      setCheckingEmail(false)
+    }
+    return false
+  }
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({ ...prev, [name]: value }))
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: "" }))
+    }
+    if (name === "email" && emailExists) {
+      setEmailExists(false)
     }
   }
 
@@ -138,11 +181,19 @@ export default function AddOldCasePage() {
     if (!formData.mobilePhone.trim()) newErrors.mobilePhone = "Mobile phone is required"
     if (!formData.email.trim()) {
       newErrors.email = "Email is required"
-    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+    } else if (!validateEmail(formData.email)) {
       newErrors.email = "Please enter a valid email address"
     }
     if (!formData.legalStatus) newErrors.legalStatus = "Legal status is required"
     if (!formData.referredBy.trim()) newErrors.referredBy = "Referred by is required"
+
+    // Check if email already exists
+    if (formData.email.trim() && validateEmail(formData.email)) {
+      const exists = await checkEmailExists(formData.email)
+      if (exists) {
+        newErrors.email = "This email is already registered"
+      }
+    }
 
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
@@ -268,12 +319,156 @@ export default function AddOldCasePage() {
         showToast("Please upload at least one document", "error")
         return
       }
+    } else if (currentStep === 8) {
+      // Step 8: Save applicant and grant, then go to review
+      await handleSaveAndContinue()
+      return
     }
 
     if (!isValid) return
 
-    if (currentStep < 8) {
+    if (currentStep < STEPS.length) {
       setCurrentStep(currentStep + 1)
+    }
+  }
+
+  const handleSaveAndContinue = async () => {
+    setIsSubmitting(true)
+    try {
+      const token = getAuthToken()
+      if (!token) {
+        showToast("Authentication required", "error")
+        setIsSubmitting(false)
+        return
+      }
+
+      // Step 1: Save the applicant
+      const submitData = new FormData()
+      submitData.append("firstName", formData.firstName)
+      submitData.append("lastName", formData.lastName)
+      submitData.append("streetAddress", formData.streetAddress)
+      submitData.append("city", formData.city)
+      submitData.append("state", formData.state)
+      submitData.append("zipCode", formData.zipCode)
+      submitData.append("gender", formData.gender)
+      submitData.append("dateOfBirth", formData.dateOfBirth)
+      submitData.append("mobilePhone", formData.mobilePhone)
+      submitData.append("homePhone", formData.homePhone)
+      submitData.append("email", formData.email)
+      submitData.append("legalStatus", formData.legalStatus)
+      submitData.append("referredBy", formData.referredBy)
+      submitData.append("referrerPhone", formData.referrerPhone)
+      submitData.append("employmentStatus", formData.employmentStatus)
+      submitData.append("dependentsInfo", formData.dependentsInfo)
+      submitData.append("totalMonthlyIncome", formData.totalMonthlyIncome)
+      submitData.append("incomeSources", formData.incomeSources)
+      submitData.append("rentMortgage", formData.rentMortgage)
+      submitData.append("utilities", formData.utilities)
+      submitData.append("food", formData.food)
+      submitData.append("otherExpenses", formData.otherExpenses)
+      submitData.append("totalDebts", formData.totalDebts)
+      submitData.append("requestType", formData.requestType)
+      submitData.append("amountRequested", formData.amountRequested)
+      submitData.append("whyApplying", formData.whyApplying)
+      submitData.append("circumstances", formData.circumstances)
+      submitData.append("previousZakat", formData.previousZakat)
+      submitData.append("zakatResourceSource", formData.zakatResourceSource)
+      submitData.append("reference1", JSON.stringify(formData.reference1))
+      submitData.append("reference2", JSON.stringify(formData.reference2))
+      submitData.append("skipEmail", "true") // Old cases don't send emails
+
+      for (let i = 0; i < formData.documents.length; i++) {
+        const file = formData.documents[i]
+        if (file && file instanceof File) {
+          submitData.append("documents", file)
+        }
+      }
+
+      const response = await axios.post(API_URL, submitData, {
+        headers: { 
+          "Content-Type": "multipart/form-data",
+          Authorization: `Bearer ${token}`,
+        },
+      })
+
+      if (response.status === 201 || response.data.applicant) {
+        const applicantId = response.data.applicant?._id || response.data._id
+        
+        // Step 2: Create grant if details are provided
+        if (applicantId && (formData.approvedAmount || formData.numberOfMonths)) {
+          try {
+            const grantData: any = {
+              applicantId,
+              status: formData.grantStatus || "Approved",
+              skipEmail: true, // Old cases don't send emails
+            }
+            
+            if (formData.approvedAmount) {
+              grantData.grantedAmount = Number(formData.approvedAmount)
+            }
+            
+            if (formData.numberOfMonths) {
+              grantData.numberOfMonths = Number(formData.numberOfMonths)
+            }
+
+            const grantResponse = await axios.post("/api/grants", grantData, {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            })
+
+            // Step 3: Upload payment proof documents if provided
+            console.log("Grant created response:", grantResponse.data)
+            const grantId = grantResponse.data._id || grantResponse.data.grant?._id
+            console.log("Extracted grant ID:", grantId, "Payment proof files:", formData.paymentProof.length)
+            if (grantId && formData.paymentProof.length > 0) {
+              console.log(`Uploading ${formData.paymentProof.length} payment proof document(s) to grant ${grantId}`)
+              const paymentFormData = new FormData()
+              
+              for (let i = 0; i < formData.paymentProof.length; i++) {
+                const file = formData.paymentProof[i]
+                if (file && file instanceof File) {
+                  paymentFormData.append("files", file)
+                }
+              }
+
+              try {
+                const uploadResponse = await axios.post(`/api/grants/${grantId}/payment-documents`, paymentFormData, {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`,
+                  },
+                })
+                console.log("Payment documents uploaded successfully:", uploadResponse.data)
+              } catch (uploadError: any) {
+                console.error("Error uploading payment documents:", uploadError)
+                showToast("Grant created but payment documents upload failed: " + (uploadError.response?.data?.message || uploadError.message), "error")
+              }
+            }
+          } catch (grantError: any) {
+            console.error("Error creating grant:", grantError)
+            showToast("Case saved but grant creation failed: " + (grantError.response?.data?.message || grantError.message), "error")
+          }
+        }
+
+        // Store applicant ID for redirect
+        setSavedApplicantId(applicantId)
+        // Move to review step
+        setCurrentStep(9)
+        showToast("Case and grant saved successfully!", "success")
+      } else {
+        showToast("Failed to save case", "error")
+      }
+    } catch (error: any) {
+      const errorMessage =
+        error.response?.data?.error ||
+        error.response?.data?.message ||
+        "Something went wrong saving the case. Please try again."
+      console.error("Error saving case:", error, errorMessage)
+      showToast(errorMessage, "error")
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -327,7 +522,24 @@ export default function AddOldCasePage() {
   }
 
   // Only call API when form is submitted - NOT on page load
+  // On step 9 (Review), everything is already saved in step 8, just redirect
   const handleSubmit = async () => {
+    if (savedApplicantId) {
+      showToast("Redirecting to case details...", "success")
+      setTimeout(() => {
+        router.push(`/staff/cases/${savedApplicantId}`)
+      }, 1000)
+      return
+    }
+    
+    // Fallback: if somehow we're here without savedApplicantId, redirect to cases list
+    showToast("Case saved successfully! Redirecting...", "success")
+    setTimeout(() => {
+      router.push("/staff/cases")
+    }, 1500)
+  }
+
+  const handleSubmitOld = async () => {
     console.log("handleSubmit called. Documents count:", formData.documents.length)
 
     if (!formData.documents || formData.documents.length === 0) {
@@ -388,9 +600,71 @@ export default function AddOldCasePage() {
       })
 
       if (response.status === 201 || response.data.applicant) {
+        const applicantId = response.data.applicant?._id || response.data._id
+        
+        // If grant details are provided, create a grant
+        if (applicantId && (formData.approvedAmount || formData.numberOfMonths)) {
+          try {
+            const grantData: any = {
+              applicantId,
+              status: formData.grantStatus || "Approved",
+              skipEmail: true, // Old cases don't send emails
+            }
+            
+            if (formData.approvedAmount) {
+              grantData.grantedAmount = Number(formData.approvedAmount)
+            }
+            
+            if (formData.numberOfMonths) {
+              grantData.numberOfMonths = Number(formData.numberOfMonths)
+            }
+
+            const grantResponse = await axios.post("/api/grants", grantData, {
+              headers: {
+                "Content-Type": "application/json",
+                Authorization: `Bearer ${token}`,
+              },
+            })
+
+            console.log("Grant created response:", grantResponse.data)
+
+            // Extract grant ID from response - API returns grant object directly
+            const grantId = grantResponse.data._id || grantResponse.data.grant?._id
+            console.log("Extracted grant ID:", grantId, "Payment proof files:", formData.paymentProof.length)
+
+            // If payment proof files are provided, upload them
+            if (grantId && formData.paymentProof.length > 0) {
+              console.log(`Uploading ${formData.paymentProof.length} payment proof document(s) to grant ${grantId}`)
+              const paymentFormData = new FormData()
+              
+              for (let i = 0; i < formData.paymentProof.length; i++) {
+                const file = formData.paymentProof[i]
+                if (file && file instanceof File) {
+                  paymentFormData.append("files", file)
+                }
+              }
+
+              try {
+                const uploadResponse = await axios.post(`/api/grants/${grantId}/payment-documents`, paymentFormData, {
+                  headers: {
+                    "Content-Type": "multipart/form-data",
+                    Authorization: `Bearer ${token}`,
+                  },
+                })
+                console.log("Payment documents uploaded successfully:", uploadResponse.data)
+              } catch (uploadError: any) {
+                console.error("Error uploading payment documents:", uploadError)
+                showToast("Grant created but payment documents upload failed: " + (uploadError.response?.data?.message || uploadError.message), "error")
+              }
+            }
+          } catch (grantError: any) {
+            console.error("Error creating grant:", grantError)
+            // Continue even if grant creation fails
+          }
+        }
+
         showToast("Old case added successfully! (No emails sent)", "success")
         // Redirect to the case detail page
-        const applicantId = response.data.applicant?._id || response.data._id
         if (applicantId) {
           setTimeout(() => {
             router.push(`/staff/cases/${applicantId}`)
@@ -722,20 +996,41 @@ export default function AddOldCasePage() {
                   <label className="block text-sm font-semibold text-gray-900 mb-2">
                     Email <span className="text-red-500">*</span>
                   </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleChange}
-                    className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 ${
-                      errors.email ? "border-red-500 bg-red-50" : "border-gray-300"
-                    }`}
-                    placeholder="example@email.com"
-                  />
+                  <div className="relative">
+                    <input
+                      type="email"
+                      name="email"
+                      value={formData.email}
+                      onChange={handleChange}
+                      onBlur={async () => {
+                        if (formData.email.trim() && validateEmail(formData.email)) {
+                          const exists = await checkEmailExists(formData.email)
+                          if (exists) {
+                            setErrors((prev) => ({ ...prev, email: "This email is already registered" }))
+                          }
+                        }
+                      }}
+                      className={`w-full px-4 py-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-gray-600 ${
+                        errors.email ? "border-red-500 bg-red-50" : emailExists ? "border-yellow-500 bg-yellow-50" : "border-gray-300"
+                      }`}
+                      placeholder="example@email.com"
+                    />
+                    {checkingEmail && (
+                      <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-gray-600"></div>
+                      </div>
+                    )}
+                  </div>
                   {errors.email && (
                     <p className="text-red-600 text-sm mt-1 flex items-center gap-1">
                       <AlertCircle className="w-4 h-4" />
                       {errors.email}
+                    </p>
+                  )}
+                  {emailExists && !errors.email && (
+                    <p className="text-yellow-600 text-sm mt-1 flex items-center gap-1">
+                      <AlertCircle className="w-4 h-4" />
+                      This email is already registered
                     </p>
                   )}
                 </div>
@@ -1396,6 +1691,95 @@ export default function AddOldCasePage() {
 
           {currentStep === 8 && (
             <div>
+              <h2 className="text-2xl font-bold text-gray-900 mb-8">Grant Details</h2>
+              <p className="text-gray-600 mb-6">Enter the approved grant information for this old case.</p>
+
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Approved Amount ($)
+                  </label>
+                  <input
+                    type="number"
+                    name="approvedAmount"
+                    value={formData.approvedAmount}
+                    onChange={handleChange}
+                    placeholder="Enter approved amount"
+                    min="0"
+                    step="0.01"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-600 focus:border-transparent"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Number of Months
+                  </label>
+                  <input
+                    type="number"
+                    name="numberOfMonths"
+                    value={formData.numberOfMonths}
+                    onChange={handleChange}
+                    placeholder="Enter number of months"
+                    min="1"
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-600 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">How many months will the grant be distributed over?</p>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Status
+                  </label>
+                  <select
+                    name="grantStatus"
+                    value={formData.grantStatus}
+                    onChange={handleChange}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-600 focus:border-transparent"
+                  >
+                    <option value="Pending">Pending</option>
+                    <option value="Approved">Approved</option>
+                    <option value="Rejected">Rejected</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-gray-900 mb-2">
+                    Payment Proof Documents (Optional)
+                  </label>
+                  <input
+                    type="file"
+                    multiple
+                    accept="image/*,.pdf"
+                    onChange={(e) => {
+                      const files = Array.from(e.target.files || [])
+                      setFormData((prev) => ({ ...prev, paymentProof: files }))
+                    }}
+                    className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-600 focus:border-transparent"
+                  />
+                  <p className="text-xs text-gray-500 mt-1">Upload payment proof documents if available (checks, receipts, etc.)</p>
+                  {formData.paymentProof.length > 0 && (
+                    <div className="mt-2 space-y-1">
+                      {formData.paymentProof.map((file, index) => (
+                        <p key={index} className="text-sm text-gray-600">
+                          • {file.name}
+                        </p>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                  <p className="text-sm text-blue-900">
+                    <span className="font-semibold">Note:</span> Grant details are optional. You can add them later from the case detail page.
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentStep === 9 && (
+            <div>
               <h2 className="text-2xl font-bold text-gray-900 mb-8">Review Your Application</h2>
 
               <div className="space-y-8">
@@ -1459,6 +1843,25 @@ export default function AddOldCasePage() {
                   </div>
                 )}
 
+                {(formData.approvedAmount || formData.numberOfMonths) && (
+                  <div className="pb-6 border-b border-gray-200">
+                    <h3 className="font-semibold text-gray-900 mb-3">Grant Details</h3>
+                    <div className="text-sm text-gray-600 space-y-1">
+                      {formData.approvedAmount && <p>Approved Amount: ${formData.approvedAmount}</p>}
+                      {formData.numberOfMonths && <p>Number of Months: {formData.numberOfMonths}</p>}
+                      <p>Status: {formData.grantStatus || "Approved"}</p>
+                      {formData.paymentProof.length > 0 && (
+                        <div className="mt-2">
+                          <p className="font-medium">Payment Proof Documents:</p>
+                          {formData.paymentProof.map((file, index) => (
+                            <p key={index} className="ml-4">• {file.name}</p>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                )}
+
                 <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
                   <p className="text-sm text-yellow-900">
                     <span className="font-semibold">Note:</span> This is an old case. No emails will be sent to the applicant.
@@ -1484,6 +1887,15 @@ export default function AddOldCasePage() {
                 className="px-8 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isSubmitting ? "Adding Old Case..." : "Add Old Case"}
+              </button>
+            ) : currentStep === 8 ? (
+              <button
+                onClick={handleNext}
+                disabled={isSubmitting}
+                className="px-8 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition disabled:opacity-50 disabled:cursor-not-allowed inline-flex items-center gap-2"
+              >
+                {isSubmitting ? "Saving..." : "Save & Continue to Review"}
+                <span>→</span>
               </button>
             ) : (
               <button

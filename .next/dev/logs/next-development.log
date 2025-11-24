@@ -3204,3 +3204,327 @@ It can also happen if the client has a browser extension installed which messes 
 [03:00:59.472] Server  LOG     ℹ️ All admins already in conversation
 [03:01:36.694] Browser WARN    Image with src "http://localhost:3000/logo1.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
 [03:01:36.694] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763972422373}
+[04:01:04.354] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/staff/dashboard","o":"http://localhost:3000/staff/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763975990031}
+[04:01:07.647] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/login color: rgb(120, 120, 120) color: inherit {"dp":"/staff/login","o":"http://localhost:3000/staff/login","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763975993320}
+[04:01:10.559] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763975995996}
+[04:01:13.185] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/login color: rgb(120, 120, 120) color: inherit {"dp":"/staff/login","o":"http://localhost:3000/staff/login","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763975998861}
+[04:01:30.414] Browser LOG     Login API URL: /api/auth/login
+[04:01:30.686] Browser LOG     Login response status: 200
+[04:01:30.686] Browser LOG     Login response data: {"message":"Login successful","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MGIwMWRiNTc1MWZhYjgzYjkxOGU3MiIsInJvbGUiOiJhZG1pbiIsIm5hbWUiOiJ0ZXN0aW5nIG1haWwiLCJlbWFpbCI6InN0YWZmQGdtYWlsLmNvbSIsImlhdCI6MTc2Mzk3NjAxNiwiZXhwIjoxNzY2NTY4MDE2fQ.UdfEpcXaY6Oje_JfcaNir3k37-vwFtQk_nsA5cLLFnQ","user":{"email":"staff@gmail.com","id":"690b01db5751fab83b918e72","name":"testing mail","role":"admin"}}
+[04:01:30.686] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/staff/dashboard","o":"http://localhost:3000/staff/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763976016320}
+[04:01:43.606] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases","o":"http://localhost:3000/staff/cases","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763976029279}
+[04:01:47.778] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases/add-old color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases/add-old","o":"http://localhost:3000/staff/cases/add-old","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763976033328}
+[04:10:36.760] Server  LOG      ✓ Compiled in 508ms
+[04:10:57.569] Server  LOG      ✓ Compiled in 588ms
+[04:11:17.800] Server  LOG      ✓ Compiled in 529ms
+[04:11:22.866] Server  LOG      ✓ Compiled in 468ms
+[04:11:35.119] Server  LOG      ✓ Compiled in 433ms
+[04:11:46.267] Server  LOG      ✓ Compiled in 380ms
+[04:11:58.832] Server  LOG      ✓ Compiled in 363ms
+[04:17:33.230] Server  LOG      ✓ Compiled in 1090ms
+[04:17:34.761] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases","o":"http://localhost:3000/staff/cases","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763976980433}
+[04:17:50.673] Server  LOG      ✓ Compiled in 915ms
+[04:18:39.889] Server  LOG      ✓ Compiled in 905ms
+[04:18:49.112] Server  LOG      ✓ Compiled in 418ms
+[04:18:55.331] Server  LOG      ✓ Compiled in 776ms
+[04:18:57.503] Server  LOG      ✓ Compiled in 511ms
+[04:19:09.475] Server  LOG      ✓ Compiled in 383ms
+[04:19:17.472] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases/add-old color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases/add-old","o":"http://localhost:3000/staff/cases/add-old","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977083142}
+[04:19:36.956] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases","o":"http://localhost:3000/staff/cases","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977102632}
+[04:19:39.763] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/staff/dashboard","o":"http://localhost:3000/staff/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977105436}
+[04:19:41.270] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/login color: rgb(120, 120, 120) color: inherit {"dp":"/staff/login","o":"http://localhost:3000/staff/login","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977106933}
+[04:20:12.943] Browser LOG     Login API URL: /api/auth/login
+[04:20:13.172] Browser LOG     Login response status: 200
+[04:20:13.172] Browser LOG     Login response data: {"message":"Login successful","token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY5MWM0OWE1YmIxMzQyOWEyNDU0ZDRmYyIsInJvbGUiOiJ0cmVhc3VyZXIiLCJuYW1lIjoiVHJlYXN1cmVyIFVzZXIiLCJlbWFpbCI6InRyZWFzdXJlckByYWhtYWguaW50ZXJuYWwiLCJpYXQiOjE3NjM5NzcxMzgsImV4cCI6MTc2NjU2OTEzOH0.5sY5M702KCjYfHGjiWiqUVGtwJ4ftDrB8fjUseT2oK4","user":{"email":"treasurer@rahmah.internal","id":"691c49a5bb13429a2454d4fc","name":"Treasurer User","role":"treasurer"}}
+[04:20:13.172] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/staff/dashboard","o":"http://localhost:3000/staff/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977138839}
+[04:20:19.846] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases","o":"http://localhost:3000/staff/cases","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977145519}
+[04:20:22.720] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases/691893bc9ab64d3fea046b56 color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases/[id]","o":"http://localhost:3000/staff/cases/691893bc9ab64d3fea046b56","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977148391}
+[04:21:39.708] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases","o":"http://localhost:3000/staff/cases","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977225382}
+[04:21:42.328] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases/add-old color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases/add-old","o":"http://localhost:3000/staff/cases/add-old","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977228006}
+[04:21:55.605] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases","o":"http://localhost:3000/staff/cases","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977241282}
+[04:23:56.779] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases/add-old color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases/add-old","o":"http://localhost:3000/staff/cases/add-old","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763977362449}
+[04:31:45.761] Server  LOG      ✓ Compiled in 305ms
+[04:32:14.621] Server  LOG      ✓ Compiled in 277ms
+[04:32:41.205] Server  LOG      ✓ Compiled in 281ms
+[04:33:15.361] Server  LOG      ✓ Compiled in 475ms
+[04:33:19.249] Server  LOG      ✓ Compiled in 928ms
+[04:33:45.756] Server  LOG      ✓ Compiled in 644ms
+[04:34:08.759] Server  LOG      ✓ Compiled in 382ms
+[04:34:22.925] Server  LOG      ✓ Compiled in 465ms
+[04:38:23.783] Server  LOG      ✓ Compiled in 553ms
+[04:38:45.338] Server  LOG      ✓ Compiled in 1588ms
+[04:40:45.314] Server  LOG      POST received 1 "files"
+[04:40:45.322] Server  LOG      File uploaded: "uploads/1763978371099-2be5c76ef671-ssssasdff.PNG" "http://localhost:3000/uploads/1763978371099-2be5c76ef671-ssssasdff.PNG"
+[04:40:45.325] Server  LOG      Documents to save: 1
+[04:40:45.552] Server  LOG      Applicant saved with 1 "documents"
+[04:40:45.553] Server  LOG     Saved zakatResourceSource: "asdf"
+[04:40:45.554] Server  LOG     Skipping email notifications (old case)
+[04:40:45.867] Server  LOG     Creating/updating grant: {}
+[04:40:45.941] Server  LOG     ✅ Grant saved successfully: {}
+[04:40:46.012] Server  LOG     ✅ Updated applicant status to Approved
+[04:40:46.084] Server  LOG     [grant] Skipping email notification (old case or skipEmail flag set)
+[04:40:55.595] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases/69242c83fd2a78d3c6521f59 color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases/[id]","o":"http://localhost:3000/staff/cases/69242c83fd2a78d3c6521f59","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763978381219}
+[04:42:19.114] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/messages?caseId=CASE-20251124-FCAL5L&applicantId=69242c83fd2a78d3c6521f59 color: rgb(120, 120, 120) color: inherit {"dp":"/messages","o":"http://localhost:3000/messages?caseId=CASE-20251124-FCAL5L&applicantId=69242c83fd2a78d3c6521f59","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763978464767}
+[04:42:19.238] Server  LOG     Querying conversations with: {}
+[04:42:19.247] Server  LOG     Authenticated user: {}
+[04:42:20.085] Server  ERROR   POST conversation error: MongoServerError: E11000 duplicate key error collection: mern_app.conversations index: caseId_1 dup key: { caseId: ObjectId('69242c83fd2a78d3c6521f59') }
+[04:42:20.600] Server  LOG     Querying conversations with: {}
+[04:42:20.605] Server  LOG     Authenticated user: {}
+[04:42:21.071] Server  LOG     Querying conversations with: {}
+[04:42:21.110] Server  LOG     Authenticated user: {}
+[04:42:21.615] Server  LOG     Querying conversations with: {}
+[04:42:21.660] Server  LOG     Authenticated user: {}
+[04:42:22.436] Server  LOG     Querying conversations with: {}
+[04:42:22.440] Server  LOG     Authenticated user: {}
+[04:42:22.972] Server  LOG     Querying conversations with: {}
+[04:42:22.982] Server  LOG     Authenticated user: {}
+[04:42:23.635] Server  LOG     Querying conversations with: {}
+[04:42:23.639] Server  LOG     Authenticated user: {}
+[04:42:24.170] Server  LOG     Querying conversations with: {}
+[04:42:24.181] Server  LOG     Authenticated user: {}
+[04:42:24.673] Server  LOG     Querying conversations with: {}
+[04:42:24.680] Server  LOG     Authenticated user: {}
+[04:42:25.197] Server  LOG     Querying conversations with: {}
+[04:42:25.200] Server  LOG     Authenticated user: {}
+[04:42:25.641] Server  LOG     Querying conversations with: {}
+[04:42:25.645] Server  LOG     Authenticated user: {}
+[04:42:26.093] Server  LOG     Querying conversations with: {}
+[04:42:26.097] Server  LOG     Authenticated user: {}
+[04:42:26.520] Server  LOG     Querying conversations with: {}
+[04:42:26.524] Server  LOG     Authenticated user: {}
+[04:42:26.949] Server  LOG     Querying conversations with: {}
+[04:42:26.953] Server  LOG     Authenticated user: {}
+[04:43:16.419] Server  LOG      ✓ Compiled in 856ms
+[04:43:34.349] Server  LOG      ✓ Compiled in 493ms
+[04:43:44.970] Server  LOG      ✓ Compiled in 367ms
+[04:43:54.270] Server  LOG      ✓ Compiled in 425ms
+[04:44:12.399] Server  LOG      ✓ Compiled in 566ms
+[04:45:23.443] Server  LOG      ✓ Compiled in 800ms
+[04:45:27.401] Server  LOG      ✓ Compiled in 1079ms
+[04:45:42.041] Server  LOG      ✓ Compiled in 408ms
+[04:47:42.975] Server  LOG     Querying conversations with: {}
+[04:47:42.978] Server  LOG     Authenticated user: {}
+[04:47:46.251] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases/69242c83fd2a78d3c6521f59 color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases/[id]","o":"http://localhost:3000/staff/cases/69242c83fd2a78d3c6521f59","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763978791921}
+[04:47:46.629] Browser LOG     Grant data fetched: {"__v":0,"_id":"69242c83fd2a78d3c6521f61","amount":599,"applicantId":{"__v":0,"_id":"69242c83fd2a78d3c6521f59","amountRequested":342,"caseId":"CASE-20251124-FCAL5L","circumstances":"asdf","city":"Los Angeles","createdAt":"2025-11-24T09:59:31.254Z","dateOfBirth":"1978-08-09T00:00:00.000Z","dependentsInfo":"asdf","documents":[{"_id":"69242c83fd2a78d3c6521f5a","filename":"uploads/1763978371099-2be5c76ef671-ssssasdff.PNG","mimeType":"image/png","originalname":"ssssasdff.PNG","size":12888,"uploadedAt":"2025-11-24T09:59:31.104Z","url":"http://localhost:3000/uploads/1763978371099-2be5c76ef671-ssssasdff.PNG"}],"email":"samreenakbar876@gmail.com","employmentStatus":"self-employed","firstName":"Sara","food":23324,"gender":"male","homePhone":"08325550174","incomeSources":"zxc","lastName":"Ahmed","legalStatus":"citizen","mobilePhone":"03105554432","otherExpenses":"234","previousZakat":"yes","reference1":{"email":"aisha.ahmed@example.com","fullName":"Aisha Ahmed","phoneNumber":"08325550174","relationship":"asd"},"reference2":{"email":"sara.ahmed@example.com","fullName":"Sara Ahmed","phoneNumber":"03105554432","relationship":"asdf"},"referredBy":"Imam Yusuf Ali","referrerPhone":"08325550174","rentMortgage":324,"requestType":"Zakat","state":"Texas","status":"Approved","streetAddress":"1457 Willow Lane","totalDebts":234,"totalMonthlyIncome":34,"updatedAt":"2025-11-24T09:59:31.724Z","utilities":234,"whyApplying":"qwer","zakatResourceSource":"asdf","zipCode":"90017"},"createdAt":"2025-11-24T09:59:31.650Z","grantedAmount":599,"id":"69242c83fd2a78d3c6521f61","numberOfMonths":2,"paymentDocuments":[],"status":"Approved","updatedAt":"2025-11-24T09:59:31.650Z"}
+[04:47:46.629] Browser LOG     Payment documents in grant: []
+[04:47:46.797] Browser LOG     Grant data fetched: {"__v":0,"_id":"69242c83fd2a78d3c6521f61","amount":599,"applicantId":{"__v":0,"_id":"69242c83fd2a78d3c6521f59","amountRequested":342,"caseId":"CASE-20251124-FCAL5L","circumstances":"asdf","city":"Los Angeles","createdAt":"2025-11-24T09:59:31.254Z","dateOfBirth":"1978-08-09T00:00:00.000Z","dependentsInfo":"asdf","documents":[{"_id":"69242c83fd2a78d3c6521f5a","filename":"uploads/1763978371099-2be5c76ef671-ssssasdff.PNG","mimeType":"image/png","originalname":"ssssasdff.PNG","size":12888,"uploadedAt":"2025-11-24T09:59:31.104Z","url":"http://localhost:3000/uploads/1763978371099-2be5c76ef671-ssssasdff.PNG"}],"email":"samreenakbar876@gmail.com","employmentStatus":"self-employed","firstName":"Sara","food":23324,"gender":"male","homePhone":"08325550174","incomeSources":"zxc","lastName":"Ahmed","legalStatus":"citizen","mobilePhone":"03105554432","otherExpenses":"234","previousZakat":"yes","reference1":{"email":"aisha.ahmed@example.com","fullName":"Aisha Ahmed","phoneNumber":"08325550174","relationship":"asd"},"reference2":{"email":"sara.ahmed@example.com","fullName":"Sara Ahmed","phoneNumber":"03105554432","relationship":"asdf"},"referredBy":"Imam Yusuf Ali","referrerPhone":"08325550174","rentMortgage":324,"requestType":"Zakat","state":"Texas","status":"Approved","streetAddress":"1457 Willow Lane","totalDebts":234,"totalMonthlyIncome":34,"updatedAt":"2025-11-24T09:59:31.724Z","utilities":234,"whyApplying":"qwer","zakatResourceSource":"asdf","zipCode":"90017"},"createdAt":"2025-11-24T09:59:31.650Z","grantedAmount":599,"id":"69242c83fd2a78d3c6521f61","numberOfMonths":2,"paymentDocuments":[],"status":"Approved","updatedAt":"2025-11-24T09:59:31.650Z"}
+[04:47:46.797] Browser LOG     Payment documents in grant: []
+[04:47:53.320] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/messages color: rgb(120, 120, 120) color: inherit {"dp":"/messages","o":"http://localhost:3000/messages","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763978798997}
+[04:47:53.399] Server  LOG     Querying conversations with: {}
+[04:47:53.407] Server  LOG     Authenticated user: {}
+[04:47:53.846] Server  LOG     Querying conversations with: {}
+[04:47:53.850] Server  LOG     Authenticated user: {}
+[04:48:22.332] Server  LOG      ✓ Compiled in 291ms
+[04:48:50.469] Server  LOG      ✓ Compiled in 1328ms
+[04:49:19.015] Server  LOG      ✓ Compiled in 582ms
+[04:49:30.756] Server  LOG      ✓ Compiled in 355ms
+[04:51:01.392] Server  LOG      ✓ Compiled in 260ms
+[04:51:01.509] Browser ERROR   uncaughtError: ReferenceError: showArchived is not defined
+[04:51:06.913] Server  LOG      ✓ Compiled in 296ms
+[04:51:06.919] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[04:51:08.001] Browser ERROR   Error fetching conversations: {}
+[04:51:08.001] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/messages color: rgb(120, 120, 120) color: inherit {"dp":"/messages","o":"http://localhost:3000/messages","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763978992802}
+[04:51:08.001] Browser ERROR   uncaughtError: ReferenceError: showArchived is not defined
+[04:51:17.820] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/messages" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en">
+                          <body
+                            className="font-sans antialiased"
+-                           cz-shortcut-listen="true"
+                          >
+                  ...
+
+[04:51:17.820] Browser ERROR   Error fetching conversations: {}
+[04:51:17.820] Browser ERROR   uncaughtError: ReferenceError: showArchived is not defined
+[04:51:17.901] Server  LOG      ✓ Compiled in 290ms
+[04:51:17.961] Server  WARN     ⚠ Fast Refresh had to perform a full reload due to a runtime error.
+[04:51:22.116] Server  LOG     Querying conversations with: {}
+[04:51:22.120] Server  LOG     Authenticated user: {}
+[04:51:23.420] Server  LOG      ✓ Compiled in 240ms
+[04:51:23.906] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/messages" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en">
+                          <body
+                            className="font-sans antialiased"
+-                           data-new-gr-c-s-check-loaded="14.1264.0"
+-                           data-gr-ext-installed=""
+                          >
+                  ...
+
+[04:51:23.906] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[04:51:23.906] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/messages","route":"/messages"}
+[04:51:23.906] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/messages color: rgb(120, 120, 120) color: inherit {"dp":"/messages","o":"http://localhost:3000/messages","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979008015}
+[04:51:23.906] Browser WARN    Image with src "http://localhost:3000/logo1.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[04:51:50.814] Server  LOG     Querying conversations with: {}
+[04:51:50.818] Server  LOG     Authenticated user: {}
+[04:51:51.761] Server  LOG     Querying conversations with: {}
+[04:51:51.765] Server  LOG     Authenticated user: {}
+[04:52:11.095] Server  LOG     🟢 Admin POST message endpoint called
+[04:52:11.400] Server  LOG     🔹 User authenticated: {}
+[04:52:11.401] Server  LOG     🔹 Staff user detected: "treasurer.user@rahmah.internal" "Role:" "treasurer" "SenderRole:" "treasurer"
+[04:52:11.404] Server  LOG     🔹 Form data parsed {}
+[04:52:11.405] Server  LOG     ✅ Database connected
+[04:52:11.559] Server  LOG     🔹 Conversation fetched: "6923f8a9fd2a78d3c65214f9"
+[04:52:11.560] Server  LOG     🔹 Message data prepared {}
+[04:52:11.718] Server  LOG     ✅ Admin message saved: "69242f31fd2a78d3c65220f0"
+[04:52:11.873] Server  LOG     ✅ Conversation updated with new message
+[04:52:11.874] Server  LOG     🟢 Admin POST message completed successfully
+[04:52:12.710] Server  LOG     Querying conversations with: {}
+[04:52:12.713] Server  LOG     Authenticated user: {}
+[04:55:34.174] Server  LOG      ✓ Compiled in 247ms
+[04:55:46.076] Server  LOG      ✓ Compiled in 434ms
+[04:56:28.907] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/messages" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en">
+                          <body
+                            className="font-sans antialiased"
+-                           cz-shortcut-listen="true"
+                          >
+                  ...
+
+[04:56:29.123] Server  LOG     Querying conversations with: {}
+[04:56:29.140] Server  LOG     Authenticated user: {}
+[04:56:29.332] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[04:56:29.332] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/messages","route":"/messages"}
+[04:56:29.332] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/messages color: rgb(120, 120, 120) color: inherit {"dp":"/messages","o":"http://localhost:3000/messages","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979314977}
+[04:56:29.919] Browser WARN    Image with src "http://localhost:3000/logo1.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[04:56:34.154] Server  LOG     Querying conversations with: {}
+[04:56:34.159] Server  LOG     Authenticated user: {}
+[04:56:35.097] Server  LOG     Querying conversations with: {}
+[04:56:35.102] Server  LOG     Authenticated user: {}
+[04:58:42.864] Browser ERROR   A tree hydrated but some attributes of the server rendered HTML didn't match the client properties. This won't be patched up. This can happen if a SSR-ed Client Component used:
+
+- A server/client branch `if (typeof window !== 'undefined')`.
+- Variable input such as `Date.now()` or `Math.random()` which changes each time it's called.
+- Date formatting in a user's locale which doesn't match the server.
+- External changing data without sending a snapshot of it along with the HTML.
+- Invalid HTML tag nesting.
+
+It can also happen if the client has a browser extension installed which messes with the HTML before React loaded.
+
+%s%s https://react.dev/link/hydration-mismatch 
+
+  ...
+    <HotReload globalError={[...]} webSocket={WebSocket} staticIndicatorState={{pathname:null, ...}}>
+      <AppDevOverlayErrorBoundary globalError={[...]}>
+        <ReplaySsrOnlyErrors>
+        <DevRootHTTPAccessFallbackBoundary>
+          <HTTPAccessFallbackBoundary notFound={<NotAllowedRootHTTPFallbackError>}>
+            <HTTPAccessFallbackErrorBoundary pathname="/messages" notFound={<NotAllowedRootHTTPFallbackError>} ...>
+              <RedirectBoundary>
+                <RedirectErrorBoundary router={{...}}>
+                  <Head>
+                  <__next_root_layout_boundary__>
+                    <SegmentViewNode type="layout" pagePath="layout.tsx">
+                      <SegmentTrieNode>
+                      <link>
+                      <script>
+                      <script>
+                      <RootLayout>
+                        <html lang="en">
+                          <body
+                            className="font-sans antialiased"
+-                           cz-shortcut-listen="true"
+                          >
+                  ...
+
+[04:58:43.053] Server  LOG     Querying conversations with: {}
+[04:58:43.061] Server  LOG     Authenticated user: {}
+[04:58:43.169] Browser LOG     %c[Vercel Web Analytics]%c Debug mode is enabled by default in development. No requests will be sent to the server. color: rgb(120, 120, 120) color: inherit
+[04:58:43.169] Browser LOG     %c[Vercel Web Analytics]%c Running queued event color: rgb(120, 120, 120) color: inherit pageview {"path":"/messages","route":"/messages"}
+[04:58:43.169] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/messages color: rgb(120, 120, 120) color: inherit {"dp":"/messages","o":"http://localhost:3000/messages","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979448733}
+[04:58:43.635] Browser WARN    Image with src "http://localhost:3000/logo1.svg" has either width or height modified, but not the other. If you use CSS to change the size of your image, also include the styles 'width: "auto"' or 'height: "auto"' to maintain the aspect ratio.
+[04:58:52.241] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/ color: rgb(120, 120, 120) color: inherit {"dp":"/","o":"http://localhost:3000/","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979457734}
+[04:58:54.302] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/staff/dashboard","o":"http://localhost:3000/staff/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979459976}
+[04:58:55.537] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/messages color: rgb(120, 120, 120) color: inherit {"dp":"/messages","o":"http://localhost:3000/messages","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979461202}
+[04:58:55.760] Server  LOG     Querying conversations with: {}
+[04:58:55.763] Server  LOG     Authenticated user: {}
+[04:58:56.384] Server  LOG     Querying conversations with: {}
+[04:58:56.387] Server  LOG     Authenticated user: {}
+[04:58:57.561] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/staff/dashboard","o":"http://localhost:3000/staff/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979463237}
+[04:58:58.876] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/messages color: rgb(120, 120, 120) color: inherit {"dp":"/staff/messages","o":"http://localhost:3000/staff/messages","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979464548}
+[04:59:52.614] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/staff/dashboard","o":"http://localhost:3000/staff/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979518262}
+[04:59:59.502] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases/6923f869fd2a78d3c65214ca color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases/[id]","o":"http://localhost:3000/staff/cases/6923f869fd2a78d3c65214ca","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979525178}
+[05:00:06.719] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/dashboard color: rgb(120, 120, 120) color: inherit {"dp":"/staff/dashboard","o":"http://localhost:3000/staff/dashboard","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979532396}
+[05:00:22.231] Browser LOG     %c[Vercel Web Analytics]%c [pageview] http://localhost:3000/staff/cases color: rgb(120, 120, 120) color: inherit {"dp":"/staff/cases","o":"http://localhost:3000/staff/cases","sdkn":"@vercel/analytics/next","sdkv":"1.5.0","sv":"0.1.3","ts":1763979547908}

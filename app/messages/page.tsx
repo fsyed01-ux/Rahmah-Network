@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState, useRef } from "react"
-import { Mail, Send, Paperclip, AlertCircle, CheckCircle2, Archive, Check, CheckCheck } from 'lucide-react'
+import { Mail, Send, Paperclip, AlertCircle, CheckCircle2, Check, CheckCheck } from 'lucide-react'
 import Link from "next/link"
 import { authenticatedFetch, getAuthToken } from "@/lib/auth-utils"
 import { jwtDecode } from "jwt-decode"
@@ -57,7 +57,6 @@ export default function MessagesPage() {
   const [loadingMessages, setLoadingMessages] = useState(false)
   const [sending, setSending] = useState(false)
   const [newMessage, setNewMessage] = useState("")
-  const [showArchived, setShowArchived] = useState(false)
   const [currentUser, setCurrentUser] = useState<{ id: string; email: string; name: string; role: string } | null>(null)
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const [toast, setToast] = useState<{ message: string; type: "success" | "error"; isVisible: boolean }>({
@@ -115,7 +114,7 @@ export default function MessagesPage() {
   // Fetch conversations
   useEffect(() => {
     fetchConversations()
-  }, [showArchived])
+  }, [])
 
   // Get caseId from URL params if present - create/open conversation
   useEffect(() => {
@@ -209,7 +208,7 @@ export default function MessagesPage() {
   const fetchConversations = async (preserveUnreadCountFor?: string) => {
     try {
       setLoading(true)
-      const response = await authenticatedFetch(`/api/messages/conversations?archived=${showArchived}`)
+      const response = await authenticatedFetch(`/api/messages/conversations?archived=false`)
       if (!response.ok) throw new Error("Failed to load conversations")
       const data = await response.json()
       const serverConversations = data.conversations || []
@@ -312,11 +311,42 @@ export default function MessagesPage() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     if (!newMessage.trim() || !selectedConversation) return
 
     setSending(true)
     const messageText = newMessage
+    
+    // Optimistically update UI
+    const tempId = `temp-${Date.now()}`
+    const optimisticMessage: Message = {
+      _id: tempId,
+      body: messageText,
+      senderName: currentUser?.name || "You",
+      senderEmail: currentUser?.email || ADMIN_EMAIL,
+      senderRole: currentUser?.role || "caseworker",
+      createdAt: new Date().toISOString(),
+      attachments: [],
+      readBy: [],
+      senderId: currentUser?.id || undefined
+    }
+    setMessages(prev => [...prev, optimisticMessage])
     setNewMessage("")
+    
+    // Update conversation list optimistically
+    setConversations(prev =>
+      prev.map(conv =>
+        conv._id === selectedConversation._id
+          ? {
+              ...conv,
+              lastMessage: messageText,
+              lastMessageAt: new Date().toISOString(),
+              messageCount: conv.messageCount + 1,
+              unreadCount: 0
+            }
+          : conv
+      )
+    )
 
     try {
       const formData = new FormData()
@@ -338,47 +368,54 @@ export default function MessagesPage() {
       })
 
       if (!response.ok) {
-        const errData = await response.json()
+        const errData = await response.json().catch(() => ({}))
         throw new Error(errData?.message || "Failed to send message")
       }
 
       const result = await response.json()
       
-      // Use actual user data from token or API response
-      const newMsg: Message = {
-        _id: result._id || Date.now().toString(),
-        body: messageText,
-        senderName: result.senderName || currentUser?.name || "You",
-        senderEmail: result.senderEmail || currentUser?.email || ADMIN_EMAIL,
-        senderRole: result.senderRole || currentUser?.role || "caseworker",
-        createdAt: result.createdAt || new Date().toISOString(),
-        attachments: result.attachments || [],
-        readBy: result.readBy || [],
-        senderId: result.senderId || currentUser?.id || undefined
-      }
+      // Replace optimistic message with real one
+      setMessages(prev => prev.map(msg => 
+        msg._id === tempId 
+          ? {
+              _id: result._id || result.message?._id || tempId,
+              body: result.body || messageText,
+              senderName: result.senderName || currentUser?.name || "You",
+              senderEmail: result.senderEmail || currentUser?.email || ADMIN_EMAIL,
+              senderRole: result.senderRole || currentUser?.role || "caseworker",
+              createdAt: result.createdAt || result.message?.createdAt || new Date().toISOString(),
+              attachments: result.attachments || result.message?.attachments || [],
+              readBy: result.readBy || result.message?.readBy || [],
+              senderId: result.senderId || currentUser?.id || undefined
+            }
+          : msg
+      ))
+
+      showToast("Message sent successfully", "success")
       
-      setMessages(prev => [...prev, newMsg])
-      
-      // Update conversation list with new last message
+      // Silently refresh conversations in background
+      setTimeout(() => {
+        fetchConversations().catch(console.error)
+      }, 500)
+    } catch (error: any) {
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(msg => msg._id !== tempId))
+      setNewMessage(messageText)
+      // Revert conversation update
       setConversations(prev =>
         prev.map(conv =>
           conv._id === selectedConversation._id
             ? {
                 ...conv,
-                lastMessage: messageText,
-                lastMessageAt: new Date().toISOString(),
-                messageCount: conv.messageCount + 1,
-                unreadCount: 0
+                lastMessage: selectedConversation.lastMessage || "",
+                lastMessageAt: selectedConversation.lastMessageAt || "",
+                messageCount: Math.max(0, conv.messageCount - 1),
+                unreadCount: selectedConversation.unreadCount || 0
               }
             : conv
         )
       )
-
-      showToast("Message sent successfully", "success")
-    } catch (error: any) {
       console.error("Error sending message:", error)
-      // Restore message on error
-      setNewMessage(messageText)
       showToast(error.message || "Failed to send message", "error")
     } finally {
       setSending(false)
@@ -392,6 +429,9 @@ export default function MessagesPage() {
   const isOwnMessage = (msg: Message) => {
     if (!currentUser || !currentUser.id) return false
     
+    // Only show messages on the right if they are from the current logged-in staff member
+    // All other messages (from other staff or applicants) should be on the left
+    
     // Normalize senderId - handle both string and object formats
     let senderIdStr = ""
     if (msg.senderId) {
@@ -402,15 +442,27 @@ export default function MessagesPage() {
       }
     }
     
-    // Check by senderId first (most reliable)
-    if (senderIdStr && currentUser.id) {
-      return senderIdStr === currentUser.id
+    // Normalize current user ID
+    const currentUserIdStr = currentUser.id.toString()
+    
+    // Check by senderId first (most reliable) - must be exact match
+    if (senderIdStr && currentUserIdStr) {
+      return senderIdStr === currentUserIdStr
     }
     
-    // Fallback to email comparison
-    const msgEmail = (msg.senderEmail || "").toLowerCase()
-    const userEmail = (currentUser.email || "").toLowerCase()
-    return msgEmail === userEmail || msgEmail === ADMIN_EMAIL.toLowerCase()
+    // Fallback to email comparison - only if senderId is not available
+    // But be more strict - only match if email exactly matches current user's email
+    const msgEmail = (msg.senderEmail || "").toLowerCase().trim()
+    const userEmail = (currentUser.email || "").toLowerCase().trim()
+    
+    // Only return true if email matches AND it's not the generic admin email
+    // (unless the current user is actually using that email)
+    if (msgEmail && userEmail && msgEmail === userEmail) {
+      return true
+    }
+    
+    // If no match found, it's not the current user's message
+    return false
   }
 
   if (loading) {
@@ -441,13 +493,6 @@ export default function MessagesPage() {
             </div>
           </div>
           <div className="flex items-center gap-4">
-            <button
-              onClick={() => setShowArchived(!showArchived)}
-              className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition font-medium flex items-center gap-2"
-            >
-              <Archive className="w-4 h-4" />
-              {showArchived ? "Active" : "Archived"}
-            </button>
             <Link href="/staff/dashboard" className="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg transition font-medium">
               Back to Home
             </Link>
@@ -469,7 +514,7 @@ export default function MessagesPage() {
           <div className="flex-1 overflow-y-auto">
               {conversations.length === 0 ? (
                 <div className="p-6 text-center text-gray-500">
-                  <p className="text-sm">No {showArchived ? "archived" : "active"} conversations</p>
+                  <p className="text-sm">No conversations</p>
                 </div>
               ) : (
                 conversations.map((conv) => (
@@ -556,15 +601,41 @@ export default function MessagesPage() {
                                   : "bg-white text-gray-900 border border-gray-200"
                               }`}
                             >
-                              <div className="flex items-center gap-2 mb-1">
-                                <span className="font-semibold text-sm">{msg.senderName}</span>
-                                <span className={`text-xs ${isOwn ? "text-teal-100" : "text-gray-500"}`}>
-                                  {new Date(msg.createdAt).toLocaleTimeString([], {
-                                    hour: "2-digit",
-                                    minute: "2-digit",
-                                  })}
-                                </span>
-                              </div>
+                              {/* Only show sender name for messages from other staff members (not own messages) */}
+                              {!isOwn && msg.senderRole !== "applicant" && (
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-semibold text-sm">{msg.senderName}</span>
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(msg.createdAt).toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </span>
+                                </div>
+                              )}
+                              {/* For own messages, only show timestamp */}
+                              {isOwn && (
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="text-xs text-teal-100">
+                                    {new Date(msg.createdAt).toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </span>
+                                </div>
+                              )}
+                              {/* For applicant messages, show sender name */}
+                              {!isOwn && msg.senderRole === "applicant" && (
+                                <div className="flex items-center gap-2 mb-1">
+                                  <span className="font-semibold text-sm">{msg.senderName}</span>
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(msg.createdAt).toLocaleTimeString([], {
+                                      hour: "2-digit",
+                                      minute: "2-digit",
+                                    })}
+                                  </span>
+                                </div>
+                              )}
                               <p className="text-sm whitespace-pre-wrap">{msg.body}</p>
                               
                               {msg.attachments && msg.attachments.length > 0 && (

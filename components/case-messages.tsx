@@ -76,14 +76,31 @@ export default function CaseMessages({ caseId, conversationId, className = "", m
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
 
     if (!newMessage.trim()) return
 
     setSending(true)
+    const messageText = newMessage
+    
+    // Optimistically update UI
+    const tempId = `temp-${Date.now()}`
+    const optimisticMessage: Message = {
+      _id: tempId,
+      body: messageText,
+      senderName: "You",
+      senderEmail: "",
+      senderRole: "staff",
+      createdAt: new Date().toISOString(),
+      attachments: [],
+    }
+    setMessages(prev => [...prev, optimisticMessage])
+    setNewMessage("")
+
     try {
       const formData = new FormData()
       formData.append("conversationId", conversationId)
-      formData.append("body", newMessage)
+      formData.append("body", messageText)
       formData.append("messageType", "text")
 
       const response = await authenticatedFetch("/api/messages/send", {
@@ -92,15 +109,39 @@ export default function CaseMessages({ caseId, conversationId, className = "", m
       })
 
       if (!response.ok) {
-        throw new Error("Failed to send message")
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || "Failed to send message")
       }
 
+      const result = await response.json()
+      
+      // Replace optimistic message with real one
+      setMessages(prev => prev.map(msg => 
+        msg._id === tempId 
+          ? {
+              _id: result._id || result.message?._id || tempId,
+              body: result.body || messageText,
+              senderName: result.senderName || "You",
+              senderEmail: result.senderEmail || "",
+              senderRole: result.senderRole || "staff",
+              createdAt: result.createdAt || result.message?.createdAt || new Date().toISOString(),
+              attachments: result.attachments || result.message?.attachments || [],
+            }
+          : msg
+      ))
+
       showToast("Message sent successfully", "success")
-      setNewMessage("")
-      fetchMessages()
+      
+      // Silently refresh messages in background to get any server-side updates
+      setTimeout(() => {
+        fetchMessages().catch(console.error)
+      }, 1000)
     } catch (error: any) {
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(msg => msg._id !== tempId))
+      setNewMessage(messageText)
       console.error("Error sending message:", error)
-      showToast("Failed to send message", "error")
+      showToast(error.message || "Failed to send message", "error")
     } finally {
       setSending(false)
     }

@@ -108,14 +108,15 @@ export default function StaffMessagesPage() {
       // Fetch messages immediately without loading delay
       fetchMessages(selectedConversation.conversationId, true)
       const interval = setInterval(() => {
-        if (selectedConversation) {
+        if (selectedConversation && !sending) {
+          // Only poll if not currently sending a message to avoid conflicts
           // Don't mark as read on polling, only on initial load
           fetchMessages(selectedConversation.conversationId, false)
         }
       }, 5000) // Poll every 5 seconds
       return () => clearInterval(interval)
     }
-  }, [selectedConversation?.conversationId]) // Only depend on conversationId, not the whole object
+  }, [selectedConversation?.conversationId, sending]) // Only depend on conversationId and sending state
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -255,22 +256,26 @@ export default function StaffMessagesPage() {
         throw new Error(errorData.message || "Failed to send message")
       }
 
-      // Optimistically add message to UI
+      const result = await res.json()
+      
+      // Optimistically add message to UI with real data from server
       const newMsg: StaffMessage = {
-        _id: Date.now().toString(),
+        _id: result._id || result.message?._id || Date.now().toString(),
         body: messageText,
-        senderName: currentUser?.name || "You",
-        senderEmail: currentUser?.email || "",
-        senderRole: currentUser?.role || "",
-        senderId: currentUser?._id || "",
-        createdAt: new Date().toISOString(),
-        readBy: [],
+        senderName: result.senderName || currentUser?.name || "You",
+        senderEmail: result.senderEmail || currentUser?.email || "",
+        senderRole: result.senderRole || currentUser?.role || "",
+        senderId: result.senderId || currentUser?._id || "",
+        createdAt: result.createdAt || result.message?.createdAt || new Date().toISOString(),
+        readBy: result.readBy || [],
       }
       setMessages(prev => [...prev, newMsg])
       
-      // Refresh messages and conversations in background without causing reload
-      fetchMessages(selectedConversation.conversationId, false).catch(console.error)
-      fetchConversations().catch(console.error)
+      // Silently refresh messages and conversations in background without causing reload
+      setTimeout(() => {
+        fetchMessages(selectedConversation.conversationId, false).catch(console.error)
+        fetchConversations().catch(console.error)
+      }, 500)
     } catch (error: any) {
       console.error("Error sending message:", error)
       // Restore message text on error

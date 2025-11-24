@@ -1166,8 +1166,11 @@ function PaymentDocumentsSection({
   const [uploading, setUploading] = useState(false)
   const [deleting, setDeleting] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [showUpload, setShowUpload] = useState(false)
+  const [isExpanded, setIsExpanded] = useState(false)
   const fileInputRef = React.useRef<HTMLInputElement>(null)
   const canEdit = userRole === "treasurer" || userRole === "admin"
+  const canDelete = userRole === "treasurer" || userRole === "admin"
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files || [])
@@ -1207,6 +1210,7 @@ function PaymentDocumentsSection({
       }
 
       setSelectedFiles([])
+      setShowUpload(false)
       if (fileInputRef.current) {
         fileInputRef.current.value = ""
       }
@@ -1254,13 +1258,26 @@ function PaymentDocumentsSection({
 
   return (
     <div>
-      <h4 className="text-md font-semibold text-gray-900 mb-4">Payment Documents</h4>
-      <p className="text-sm text-gray-600 mb-4">
-        Upload payment proof documents (checks, digital payment receipts, etc.)
-      </p>
+      <div className="flex items-center justify-between mb-4">
+        <h4 className="text-md font-semibold text-gray-900">Payment Documents</h4>
+        {canEdit && (
+          <button
+            onClick={() => {
+              setShowUpload(!showUpload)
+              if (!showUpload && paymentDocuments.length === 0) {
+                setIsExpanded(true)
+              }
+            }}
+            className="px-4 py-2 bg-teal-600 text-white rounded-lg hover:bg-teal-700 transition text-sm font-medium flex items-center gap-2"
+          >
+            <Upload className="w-4 h-4" />
+            {paymentDocuments.length === 0 ? "Add Payment Proof" : "Add More"}
+          </button>
+        )}
+      </div>
 
-      {canEdit && (
-        <div className="mb-4">
+      {showUpload && canEdit && (
+        <div className="mb-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
           <input
             type="file"
             ref={fileInputRef}
@@ -1361,7 +1378,7 @@ function PaymentDocumentsSection({
                   >
                     <Download className="w-4 h-4" />
                   </a>
-                  {canEdit && (
+                  {canDelete && (
                     <button
                       onClick={() => handleDelete(docId)}
                       disabled={deleting === docId}
@@ -1381,10 +1398,15 @@ function PaymentDocumentsSection({
           })}
         </div>
       ) : (
-        <div className="text-center py-6 text-gray-500">
-          <FileText className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-          <p className="text-sm">No payment documents uploaded yet</p>
-        </div>
+        !showUpload && (
+          <div className="text-center py-6 text-gray-500">
+            <FileText className="w-12 h-12 mx-auto mb-2 text-gray-300" />
+            <p className="text-sm">No payment documents uploaded yet</p>
+            {canEdit && (
+              <p className="text-xs text-gray-400 mt-1">Click "Add Payment Proof" to upload documents</p>
+            )}
+          </div>
+        )
       )}
     </div>
   )
@@ -1464,7 +1486,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
   useEffect(() => {
     const fetchGrantData = async () => {
       try {
-        if (!id || (userRole !== "treasurer" && userRole !== "caseworker" && userRole !== "admin")) {
+        if (!id || (userRole !== "treasurer" && userRole !== "caseworker" && userRole !== "admin" && userRole !== "approver")) {
           setLoadingGrant(false)
           return
         }
@@ -1492,6 +1514,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         else if (data._id) grantInfo = data
 
         if (grantInfo) {
+          console.log("Grant data fetched:", grantInfo)
+          console.log("Payment documents in grant:", grantInfo.paymentDocuments)
           setGrantData(grantInfo)
           setGrantedAmount(grantInfo.grantedAmount || "")
           setRemarks(grantInfo.remarks || "")
@@ -2065,8 +2089,8 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
               />
             </div>
 
-            {/* Payment Documents Section - Visible to Treasurers and Admins */}
-            {grantData && (userRole === "treasurer" || userRole === "admin") && (
+            {/* Payment Documents Section - Visible to All Staff */}
+            {grantData && (
               <div className="bg-white rounded-lg p-6 mb-6">
                 <PaymentDocumentsSection
                   grantId={grantData._id}

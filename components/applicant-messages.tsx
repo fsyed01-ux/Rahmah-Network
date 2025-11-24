@@ -156,20 +156,48 @@ export default function ApplicantMessages({
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault()
+    e.stopPropagation()
     if (!newMessage.trim() && selectedImages.length === 0) return
 
     setSending(true)
+
+    const messageText = newMessage
+    const imagesToSend = [...selectedImages]
+    const previewsToSend = [...imagePreviews]
+
+    // Optimistically update UI
+    const tempId = `temp-${Date.now()}`
+    const optimisticMessage: Message = {
+      _id: tempId,
+      body: messageText || "",
+      senderName: "You",
+      senderEmail: "",
+      senderRole: "applicant",
+      createdAt: new Date().toISOString(),
+      attachments: imagesToSend.map((img, idx) => ({
+        url: previewsToSend[idx] || "",
+        originalname: img.name,
+        mimeType: img.type,
+      })),
+    }
+    setMessages(prev => [...prev, optimisticMessage])
+    setNewMessage("")
+    setSelectedImages([])
+    setImagePreviews([])
+    if (fileInputRef.current) {
+      fileInputRef.current.value = ""
+    }
 
     try {
       const token = sessionStorage.getItem("applicantToken")
       const formData = new FormData()
 
       formData.append("conversationId", conversationId)
-      formData.append("body", newMessage || "")
+      formData.append("body", messageText || "")
       formData.append("messageType", "text")
 
       // Add images
-      selectedImages.forEach((image) => {
+      imagesToSend.forEach((image) => {
         formData.append("attachments", image)
       })
 
@@ -189,17 +217,40 @@ export default function ApplicantMessages({
         body: formData,
       })
 
-      if (!response.ok) throw new Error("Failed to send message")
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.message || "Failed to send message")
+      }
+
+      const result = await response.json()
+      
+      // Replace optimistic message with real one
+      setMessages(prev => prev.map(msg => 
+        msg._id === tempId 
+          ? {
+              _id: result._id || result.message?._id || tempId,
+              body: result.body || messageText,
+              senderName: result.senderName || "You",
+              senderEmail: result.senderEmail || "",
+              senderRole: result.senderRole || "applicant",
+              createdAt: result.createdAt || result.message?.createdAt || new Date().toISOString(),
+              attachments: result.attachments || result.message?.attachments || optimisticMessage.attachments,
+            }
+          : msg
+      ))
 
       showToast("Message sent", "success")
-      setNewMessage("")
-      setSelectedImages([])
-      setImagePreviews([])
-      if (fileInputRef.current) {
-        fileInputRef.current.value = ""
-      }
-      fetchMessages()
+      
+      // Silently refresh messages in background to get any server-side updates
+      setTimeout(() => {
+        fetchMessages().catch(console.error)
+      }, 1000)
     } catch (error: any) {
+      // Remove optimistic message on error
+      setMessages(prev => prev.filter(msg => msg._id !== tempId))
+      setNewMessage(messageText)
+      setSelectedImages(imagesToSend)
+      setImagePreviews(previewsToSend)
       showToast(error.message || "Error sending message", "error")
     } finally {
       setSending(false)

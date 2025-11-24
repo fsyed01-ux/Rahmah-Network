@@ -659,7 +659,8 @@ function RoleBasedStatusSection({
 
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-900 mb-2">Remarks</label>
-            {canSetGrantAmount ? (
+            {/* Caseworkers and approvers can edit remarks */}
+            {(canSetGrantAmount || userRole === "caseworker" || userRole === "admin") ? (
               <textarea
                 value={remarks}
                 onChange={(e) => setRemarks(e.target.value)}
@@ -1637,12 +1638,15 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         setUpdateStatus(updatedData.applicant.status)
       }
 
-      // Call grant API if user is Approver and has grant amount, OR if caseworker has numberOfMonths
-      const shouldCreateGrant = 
+      // Update or create grant based on user role and available data
+      // Caseworkers can update/create grants with status, numberOfMonths, and remarks
+      // Approvers can update/create grants with status, grantedAmount, and remarks
+      const shouldUpdateGrant = 
         (userRole === "approver" && (grantedAmount !== "" && grantedAmount !== null)) ||
-        (userRole === "caseworker" && (numberOfMonths !== "" && numberOfMonths !== null))
+        (userRole === "caseworker" && (numberOfMonths !== "" && numberOfMonths !== null || grantData)) ||
+        (userRole === "admin" && (grantedAmount !== "" && grantedAmount !== null || numberOfMonths !== "" && numberOfMonths !== null || grantData))
       
-      if (shouldCreateGrant) {
+      if (shouldUpdateGrant) {
         const grantPayload: any = {
           applicantId: id,
           status: updateStatus,
@@ -1652,17 +1656,33 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
         if (userRole === "approver" && grantedAmount !== "" && grantedAmount !== null) {
           grantPayload.grantedAmount = Number(grantedAmount)
         }
-        // Only caseworkers can set numberOfMonths
+        // Caseworkers can set numberOfMonths
         if (userRole === "caseworker" && numberOfMonths !== "" && numberOfMonths !== null) {
           grantPayload.numberOfMonths = Number(numberOfMonths)
         }
-        // Only approvers can set remarks
-        if (userRole === "approver" && remarks) {
+        // Admin can set both
+        if (userRole === "admin") {
+          if (grantedAmount !== "" && grantedAmount !== null) {
+            grantPayload.grantedAmount = Number(grantedAmount)
+          }
+          if (numberOfMonths !== "" && numberOfMonths !== null) {
+            grantPayload.numberOfMonths = Number(numberOfMonths)
+          }
+        }
+        // Caseworkers and approvers can set remarks
+        if (remarks && (userRole === "caseworker" || userRole === "approver" || userRole === "admin")) {
           grantPayload.remarks = remarks
         }
 
-        const grantResponse = await fetch(`/api/grants`, {
-          method: "POST",
+        // If grant already exists, use PUT to update it
+        // Otherwise, use POST to create it
+        const grantMethod = grantData?._id ? "PUT" : "POST"
+        const grantUrl = grantData?._id 
+          ? `/api/grants/${grantData._id}`
+          : `/api/grants`
+
+        const grantResponse = await fetch(grantUrl, {
+          method: grantMethod,
           headers: {
             "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
@@ -1682,7 +1702,7 @@ export default function Page({ params }: { params: Promise<{ id: string }> }) {
           setUpdateStatus(grantStatus)
         } else {
           const errorData = await grantResponse.json().catch(() => ({}))
-          throw new Error(errorData.message || `Grant creation failed: ${grantResponse.status}`)
+          throw new Error(errorData.message || `Grant ${grantMethod === "PUT" ? "update" : "creation"} failed: ${grantResponse.status}`)
         }
       }
 

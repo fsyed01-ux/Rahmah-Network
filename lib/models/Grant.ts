@@ -7,10 +7,12 @@ const grantSchema = new mongoose.Schema(
       ref: "ZakatApplicant",
       required: true,
     },
-    // Primary field - required (0 is a valid value)
+    // Primary field - conditionally required
+    // Required only if numberOfMonths is not provided (for approvers setting amount)
+    // Caseworkers can create grants with only numberOfMonths
     grantedAmount: {
       type: Number,
-      required: [true, "grantedAmount is required"],
+      required: false, // Made optional - will be validated in pre-save middleware
       min: [0, "grantedAmount cannot be negative"],
     },
     status: {
@@ -68,9 +70,20 @@ grantSchema.pre("save", function (next) {
     if (this.amountGranted !== undefined) {
       delete this.amountGranted
     }
-    // Ensure grantedAmount is set
-    if (this.grantedAmount === undefined || this.grantedAmount === null) {
-      return next(new Error("grantedAmount is required for new grants"))
+    // For new grants: either grantedAmount OR numberOfMonths must be provided
+    // This allows caseworkers to create grants with only numberOfMonths
+    const hasGrantedAmount = this.grantedAmount !== undefined && this.grantedAmount !== null
+    const hasNumberOfMonths = this.numberOfMonths !== undefined && this.numberOfMonths !== null
+    
+    if (!hasGrantedAmount && !hasNumberOfMonths) {
+      return next(new Error("Either grantedAmount or numberOfMonths is required for new grants"))
+    }
+    
+    // If grantedAmount is not provided, set it to 0 to satisfy any other validation
+    // (but this should not be required if numberOfMonths is provided)
+    if (!hasGrantedAmount && hasNumberOfMonths) {
+      // Allow grants with only numberOfMonths (for caseworkers)
+      // Don't set grantedAmount to 0, let it be undefined
     }
   } else {
     // For existing documents being updated, migrate amountGranted to grantedAmount if needed

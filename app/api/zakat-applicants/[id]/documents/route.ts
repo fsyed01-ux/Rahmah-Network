@@ -38,8 +38,36 @@ export async function POST(request: NextRequest, context: any) {
       uploadedBy = decoded.applicantEmail || "applicant"
     }
 
-    const formData = await request.formData()
-    const uploadedFiles = formData.getAll("documents") as any[]
+    let formData: FormData
+    try {
+      formData = await request.formData()
+    } catch (err: any) {
+      console.error("Error parsing form data:", err)
+      return NextResponse.json(
+        { error: "Invalid request format. Please ensure files are properly attached." },
+        { status: 400 }
+      )
+    }
+
+    const uploadedFiles = formData.getAll("documents")
+
+    // Validate that files were provided
+    if (!uploadedFiles || uploadedFiles.length === 0) {
+      // Check if files might be under a different key
+      const allKeys = Array.from(formData.keys())
+      console.log("FormData keys:", allKeys)
+      console.log("Uploaded files count:", uploadedFiles.length)
+      
+      return NextResponse.json(
+        { 
+          error: "No files provided. Please select at least one file to upload.",
+          debug: { keys: allKeys, filesCount: uploadedFiles.length }
+        },
+        { status: 400 }
+      )
+    }
+
+    console.log(`Received ${uploadedFiles.length} file(s) for upload`)
 
     await dbConnect()
 
@@ -53,50 +81,87 @@ export async function POST(request: NextRequest, context: any) {
 
     // Upload each file to Vercel Blob
     for (const f of uploadedFiles) {
-      if (f && typeof f === "object" && typeof f.arrayBuffer === "function") {
-        const originalName = (f as any).name || `upload-${Date.now()}`
-        
-        try {
-          const buffer = Buffer.from(await (f as any).arrayBuffer())
-          const blob = await uploadBuffer(buffer, originalName, new URL(request.url).origin)
+      // Check if it's a valid File object
+      if (!f) {
+        uploadErrors.push("Empty file entry")
+        continue
+      }
 
-          const docMetadata = {
-            filename: blob.pathname,
-            originalname: originalName,
-            mimeType: f.type || "application/octet-stream",
-            size: buffer.length,
-            url: blob.url,
-            uploadedAt: new Date(),
-            // Don't set _id - Mongoose will auto-generate ObjectId for subdocuments
-          }
-
-          documentMetadata.push(docMetadata)
-
-          const audit = new DocumentAudit({
-            applicantId,
-            documentId: blob.pathname,
-            action: "uploaded",
-            actionBy,
-            uploadedBy,
-            originalFilename: originalName,
-            fileSize: buffer.length,
-            mimeType: f.type || "application/octet-stream",
-          })
-          await audit.save()
-
-          console.log(`Document uploaded: ${blob.pathname} by ${uploadedBy}`)
-        } catch (err: any) {
-          console.error(`File upload error for ${originalName}:`, err)
-          uploadErrors.push(`${originalName}: ${err.message || "Upload failed"}`)
-        }
+      // Handle both File objects and Blob objects
+      let file: File | Blob | null = null
+      let originalName = ""
+      
+      if (f instanceof File) {
+        file = f
+        originalName = f.name
+      } else if (f && typeof f === "object" && "name" in f && "arrayBuffer" in f) {
+        // Handle File-like objects
+        file = f as any
+        originalName = (f as any).name || `upload-${Date.now()}.${(f as any).type?.split('/')[1] || 'bin'}`
       } else {
-        uploadErrors.push("Invalid file object")
+        uploadErrors.push("Invalid file format")
+        continue
+      }
+
+      if (!file || typeof (file as any).arrayBuffer !== "function") {
+        uploadErrors.push(`Invalid file object: ${originalName || "unknown"}`)
+        continue
+      }
+      
+      try {
+        const buffer = Buffer.from(await (file as any).arrayBuffer())
+        
+        // Validate file size (e.g., max 10MB)
+        const maxSize = 10 * 1024 * 1024 // 10MB
+        if (buffer.length > maxSize) {
+          uploadErrors.push(`${originalName}: File size exceeds 10MB limit`)
+          continue
+        }
+
+        if (buffer.length === 0) {
+          uploadErrors.push(`${originalName}: File is empty`)
+          continue
+        }
+
+        const blob = await uploadBuffer(buffer, originalName, new URL(request.url).origin)
+
+        const docMetadata = {
+          filename: blob.pathname,
+          originalname: originalName,
+          mimeType: (file as any).type || "application/octet-stream",
+          size: buffer.length,
+          url: blob.url,
+          uploadedAt: new Date(),
+          // Don't set _id - Mongoose will auto-generate ObjectId for subdocuments
+        }
+
+        documentMetadata.push(docMetadata)
+
+        const audit = new DocumentAudit({
+          applicantId,
+          documentId: blob.pathname,
+          action: "uploaded",
+          actionBy,
+          uploadedBy,
+          originalFilename: originalName,
+          fileSize: buffer.length,
+          mimeType: (file as any).type || "application/octet-stream",
+        })
+        await audit.save()
+
+        console.log(`Document uploaded: ${blob.pathname} by ${uploadedBy}`)
+      } catch (err: any) {
+        console.error(`File upload error for ${originalName}:`, err)
+        uploadErrors.push(`${originalName}: ${err.message || "Upload failed"}`)
       }
     }
 
-    if (documentMetadata.length === 0 && uploadedFiles.length > 0) {
+    if (documentMetadata.length === 0) {
       return NextResponse.json(
-        { error: "Failed to upload documents", details: uploadErrors },
+        { 
+          error: "Failed to upload documents", 
+          details: uploadErrors.length > 0 ? uploadErrors : ["No valid files were provided"]
+        },
         { status: 400 }
       )
     }
